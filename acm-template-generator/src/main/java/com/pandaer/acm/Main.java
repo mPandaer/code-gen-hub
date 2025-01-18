@@ -1,32 +1,48 @@
 package com.pandaer.acm;
 
 
-import com.pandaer.acm.generator.CodeFileGenerator;
-import com.pandaer.acm.model.DataModel;
+import cn.hutool.core.util.ReflectUtil;
+import com.pandaer.acm.cli.CommandExecutor;
+import com.pandaer.acm.cli.command.GenerateCommand;
+import picocli.CommandLine;
 
-import java.io.File;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 /**
  * 主程序
  */
 public class Main {
     public static void main(String[] args) {
-        // 生成一个DataModel
-        DataModel dataModel = new DataModel();
-        dataModel.setAuthor("lwh");
-        dataModel.setLoop(true);
-        dataModel.setOutputText("haha");
+        // 格式化用户输入的参数
+        args = commandNormalize(args);
+        int exitCode = new CommandLine(new CommandExecutor()).execute(args);
+        System.exit(exitCode);
+    }
 
-        // 代码生成器
-        CodeFileGenerator codeFileGenerator = new CodeFileGenerator(dataModel);
-        // 原始项目
-        String currentDir = System.getProperty("user.dir");
-        String originProjectDirPath = currentDir + File.separator + "origin-project-demo" + File.separator + "acm-template";
-        File originProject = new File(originProjectDirPath);
-        // 生成的项目
-        String generateProjectDirPath = currentDir + File.separator + "generated";
-        File generateProject = new File(generateProjectDirPath);
-        // 生成代码
-        codeFileGenerator.generator(originProject,generateProject);
+    private static String[] commandNormalize(String[] args) {
+        if (args.length == 0) return args;
+        if (!args[0].equals("generate")) return args;
+        List<String> argList = Arrays.stream(args).collect(Collectors.toList());
+        Field[] fields = ReflectUtil.getFields(GenerateCommand.class);
+        List<Field> optionFields = Arrays.stream(fields).filter(field -> field.isAnnotationPresent(CommandLine.Option.class)).collect(Collectors.toList());
+        for (Field optionField : optionFields) {
+            CommandLine.Option optionAnnotation = optionField.getAnnotation(CommandLine.Option.class);
+            String[] names = optionAnnotation.names();
+            boolean required = optionAnnotation.required();
+            if (!required) {
+                continue;
+            }
+            boolean isExist = argList.stream().anyMatch(arg -> Arrays.asList(names).contains(arg));
+            if (!isExist && names.length > 0) {
+                argList.add(names[0]);
+            }
+        }
+
+        return argList.toArray(new String[0]);
+
     }
 }
