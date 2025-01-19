@@ -1,6 +1,6 @@
-package com.pandaer.acm.generator;
+package com.pandaer.maker.generator.file;
 
-import com.pandaer.acm.model.DataModel;
+import com.pandaer.maker.meta.Meta;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -19,7 +19,7 @@ import java.util.TimeZone;
  */
 public class DynamicFileGenerator {
 
-    public static void generate(File templateFile,File generatedFile,DataModel dataModel) {
+    public static void generate(File templateFile,File generatedFile,Meta dataModel) {
 
         Configuration freemarkerConfig = null;
         try {

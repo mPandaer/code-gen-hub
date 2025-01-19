@@ -1,6 +1,6 @@
-### Code Gen Maker ###
+### My Generator Temp Dir ###
 generated
-madeGenerator
+
 
 target/
 !.mvn/wrapper/maven-wrapper.jar

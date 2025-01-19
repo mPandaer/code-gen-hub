@@ -1,9 +1,9 @@
-package com.pandaer.acm;
+package ${basePackage}.acm;
 
 
 import cn.hutool.core.util.ReflectUtil;
-import com.pandaer.acm.cli.CommandExecutor;
-import com.pandaer.acm.cli.command.GenerateCommand;
+import ${basePackage}.acm.cli.CommandExecutor;
+import ${basePackage}.acm.cli.command.GenerateCommand;
 import picocli.CommandLine;
 
 import java.lang.reflect.Field;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(String[] args) {
         // 格式化用户输入的参数
-        args = "generate -l -a -o".split(" ");
         args = commandNormalize(args);
         int exitCode = new CommandLine(new CommandExecutor()).execute(args);
         System.exit(exitCode);

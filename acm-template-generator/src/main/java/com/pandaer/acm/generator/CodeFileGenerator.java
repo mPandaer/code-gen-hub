@@ -5,7 +5,6 @@ import com.pandaer.acm.model.DataModel;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * 代码生成器
@@ -22,51 +21,32 @@ public class CodeFileGenerator {
      * @param generateProject 生成的项目
      */
     public void generator(File originProject,File generateProject) {
-        List<File> files = FileUtil.loopFiles(originProject);
-        for (File originFile : files) {
-            // 基于原始路径，生成目标路径
-            String parentDir = originFile.getParent();
-            if (parentDir == null) continue;
-//            System.out.println("原始项目绝对路径：" + originProject.getAbsolutePath());
-            String parentDirRelativePath = parentDir.replace(originProject.getAbsolutePath(),"");
+        // 改造代码 适配动态模板文件
 
-            // TODO 修复一下相对路径的Bug
-            if (parentDirRelativePath.startsWith(File.separator)) {
-                parentDirRelativePath = parentDirRelativePath.substring(1);
-            }
+        String inputPath;
+        String outputPath;
 
-//            System.out.println("相对路径: " + parentDirRelativePath);
-            String generatedParentDirPath = generateProject.getAbsolutePath() + File.separator + parentDirRelativePath;
-//            System.out.println("生成父目录路径：" + generatedParentDirPath);
-            // 保证父目录存在
-            FileUtil.mkdir(generatedParentDirPath);
+        // 生成动态文件
+        inputPath = originProject.getAbsolutePath() + File.separator + "src/main/java/com/pandaer/acm/template/MainTemplate.java.ftl";
+        outputPath = generateProject.getAbsolutePath() + File.separator + "src/main/java/com/pandaer/acm/template/MainTemplate.java";
+        // 保证outputPath的父目录存在
+        File generatedFile = FileUtil.file(outputPath);
+        FileUtil.mkParentDirs(generatedFile);
+        DynamicFileGenerator.generate(FileUtil.file(inputPath),generatedFile,dataModel);
 
-            // 判断文件类型，是静态文件还是动态文件
-            // TODO 后期优化，这里直接获取动态模板文件列表，根据文件名进行判断
-            List<File> templateFiles = getTemplateFiles();
-            boolean isExist = templateFiles.stream().anyMatch(templateFile ->
-                    templateFile.getName().equals(originFile.getName() + ".ftl"));
-            if (isExist) {
-                // 交给动态代码生成器
-                DynamicFileGenerator.generate(originFile,FileUtil.file(generatedParentDirPath),dataModel);
-            }else {
-                // 交给静态代码生成器
-                StaticFileGenerator.generate(originFile,FileUtil.file(generatedParentDirPath));
-            }
-        }
+        // 生成静态文件
+        inputPath = originProject.getAbsolutePath() + File.separator + ".gitignore";
+        outputPath = generateProject.getAbsolutePath() + File.separator + ".gitignore";
+        StaticFileGenerator.generate(FileUtil.file(inputPath),FileUtil.file(outputPath));
 
+        inputPath = originProject.getAbsolutePath() + File.separator + "pom.xml";
+        outputPath = generateProject.getAbsolutePath() + File.separator + "pom.xml";
+        StaticFileGenerator.generate(FileUtil.file(inputPath),FileUtil.file(outputPath));
+
+        inputPath = originProject.getAbsolutePath() + File.separator + "src/main/java/com/pandaer/acm/template/HelloWorld.java";
+        outputPath = generateProject.getAbsolutePath() + File.separator + "src/main/java/com/pandaer/acm/template/HelloWorld.java";
+        StaticFileGenerator.generate(FileUtil.file(inputPath),FileUtil.file(outputPath));
         System.out.println("代码生成完毕！");
     }
 
-
-    /**
-     * TODO 临时的实现
-     * 获取动态模板文件列表
-     * @return
-     */
-    private List<File> getTemplateFiles() {
-        String currentDir = System.getProperty("user.dir");
-        String templateDirPath = currentDir + File.separator + ".source";
-        return FileUtil.loopFiles(FileUtil.file(templateDirPath));
-    }
 }

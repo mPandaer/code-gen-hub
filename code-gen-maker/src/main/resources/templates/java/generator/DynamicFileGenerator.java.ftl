@@ -1,6 +1,6 @@
-package com.pandaer.acm.generator;
+package ${basePackage}.acm.generator;
 
-import com.pandaer.acm.model.DataModel;
+import ${basePackage}.acm.model.DataModel;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;

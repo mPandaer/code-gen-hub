@@ -1,0 +1,65 @@
+{
+  "name": "acm-template-generator",
+  "description": "ACM输入模板生成器",
+  "basePackage": "com.lwh",
+  "version": "1.0",
+  "author": "lwh",
+  "createTime": "2025-01-19",
+  "fileConfig": {
+    "originProjectPath": "D:/code/code-gen-hub/code-gen-maker/origin-project-demo/acm-template",
+    "generatedProjectPath": "D:/code/code-gen-hub/code-gen-maker/generated",
+    "generatorPath": "D:/code/code-gen-hub/code-gen-maker/madeGenerator",
+    "type": "dir",
+    "files": [
+      {
+        "inputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java.ftl",
+        "outputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java",
+        "type": "file",
+        "generateType": "dynamic"
+      },
+      {
+        "inputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
+        "outputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
+        "type": "file",
+        "generateType": "static"
+      },
+      {
+        "inputPath": ".gitignore",
+        "outputPath": ".gitignore",
+        "type": "file",
+        "generateType": "static"
+      },
+      {
+        "inputPath": "pom.xml",
+        "outputPath": "pom.xml",
+        "type": "file",
+        "generateType": "static"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "loop",
+        "type": "boolean",
+        "description": "是否生成循环",
+        "defaultValue": false,
+        "abbr": "l"
+      },
+      {
+        "fieldName": "author",
+        "type": "String",
+        "description": "作者注释",
+        "defaultValue": "llwwhh",
+        "abbr": "a"
+      },
+      {
+        "fieldName": "outputText",
+        "type": "String",
+        "description": "输出信息",
+        "defaultValue": "lxlxlx",
+        "abbr": "o"
+      }
+    ]
+  }
+}
