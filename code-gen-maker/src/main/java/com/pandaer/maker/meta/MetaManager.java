@@ -21,7 +21,9 @@ public class MetaManager {
 
     private static Meta initMeta() {
         String metaJsonStr = ResourceUtil.readUtf8Str(MakerConstant.META_FILE_NAME);
-        return JSONUtil.toBean(metaJsonStr, Meta.class);
+        Meta meta = JSONUtil.toBean(metaJsonStr, Meta.class);
+        MetaValidator.validate(meta);
+        return meta;
     }
 
 

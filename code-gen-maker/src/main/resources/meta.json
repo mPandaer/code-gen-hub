@@ -7,8 +7,6 @@
   "createTime": "2025-01-19",
   "fileConfig": {
     "originProjectPath": "D:/code/code-gen-hub/code-gen-maker/origin-project-demo/acm-template",
-    "generatedProjectPath": "D:/code/code-gen-hub/code-gen-maker/generated",
-    "generatorPath": "D:/code/code-gen-hub/code-gen-maker/madeGenerator",
     "type": "dir",
     "files": [
       {

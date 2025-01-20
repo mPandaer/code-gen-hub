@@ -1,6 +1,7 @@
 ### Code Gen Maker ###
 generated
 madeGenerator
+madeGenerator-dist
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
