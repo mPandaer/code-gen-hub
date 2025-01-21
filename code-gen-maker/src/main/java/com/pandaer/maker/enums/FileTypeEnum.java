@@ -5,6 +5,7 @@ package com.pandaer.maker.enums;
  */
 public enum FileTypeEnum {
     DIR("目录","dir"),
+    GROUP("文件分组","group"),
     FILE("文件","file");
 
 

@@ -1,5 +1,6 @@
 package com.pandaer.maker.meta;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,6 +8,7 @@ import com.pandaer.maker.enums.FileTypeEnum;
 import com.pandaer.maker.enums.GenerateTypeEnum;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MetaValidator {
 
@@ -26,8 +28,16 @@ public class MetaValidator {
     }
 
     private static void validateModelConfig(Meta.ModelConfig modelConfig) {
+        // TODO 缺少判空 modelConfig
         List<Meta.ModelConfig.ModelInfo> models = modelConfig.getModels();
         for (Meta.ModelConfig.ModelInfo model : models) {
+            if (StrUtil.isNotBlank(model.getGroupKey())) {
+                // TODO 数据模型组的校验逻辑后面补充
+                List<String> args = model.getModels().stream().map(subModel -> String.format("--%s", subModel.getFieldName())).collect(Collectors.toList());
+                String groupArgs = CollUtil.join(args, " ");
+                model.setGroupArgsStr(groupArgs);
+                continue;
+            }
             if (StrUtil.isBlank(model.getFieldName())) {
                 throw new ValidatedMetaException("字段名不能为空");
             }
@@ -69,6 +79,11 @@ public class MetaValidator {
     }
 
     private static void validateFileInfo(Meta.FileConfig.FileInfo file) {
+        if (FileTypeEnum.GROUP.value.equals(file.getType())) {
+            // TODO 有关分组的校验逻辑后期补充
+            return;
+        }
+
         if (StrUtil.isBlank(file.getInputPath())) {
             throw new ValidatedMetaException("项目文件输入路径不能为空");
         }

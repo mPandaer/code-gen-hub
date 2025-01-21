@@ -10,22 +10,31 @@
     "type": "dir",
     "files": [
       {
-        "inputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java.ftl",
-        "outputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java",
-        "type": "file",
-        "generateType": "dynamic"
-      },
-      {
-        "inputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
-        "outputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
-        "type": "file",
-        "generateType": "static"
+        "groupKey": "codeFiles",
+        "groupName": "Java代码文件组",
+        "type": "group",
+        "condition": "needCodeFile",
+        "files": [
+          {
+            "inputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java.ftl",
+            "outputPath": "src/main/java/com/pandaer/acm/template/MainTemplate.java",
+            "type": "file",
+            "generateType": "dynamic"
+          },
+          {
+            "inputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
+            "outputPath": "src/main/java/com/pandaer/acm/template/HelloWorld.java",
+            "type": "file",
+            "generateType": "static"
+          }
+        ]
       },
       {
         "inputPath": ".gitignore",
         "outputPath": ".gitignore",
         "type": "file",
-        "generateType": "static"
+        "generateType": "static",
+        "condition": "needGit"
       },
       {
         "inputPath": "pom.xml",
@@ -37,27 +46,50 @@
   },
   "modelConfig": {
     "models": [
+
       {
-        "fieldName": "loop",
+        "fieldName": "needGit",
         "type": "boolean",
-        "description": "是否生成循环",
-        "defaultValue": false,
-        "abbr": "l"
+        "description": "是否生成.gitignore",
+        "defaultValue": true
       },
       {
-        "fieldName": "author",
-        "type": "String",
-        "description": "作者注释",
-        "defaultValue": "llwwhh",
-        "abbr": "a"
+        "fieldName": "needCodeFile",
+        "type": "boolean",
+        "description": "是否生成代码文件",
+        "defaultValue": true
       },
       {
-        "fieldName": "outputText",
-        "type": "String",
-        "description": "输出信息",
-        "defaultValue": "lxlxlx",
-        "abbr": "o"
+        "groupKey": "mainTemplate",
+        "groupName": "核心模版代码内容数据组",
+        "type": "MainTemplate",
+        "condition": "needCodeFile",
+        "models": [
+          {
+            "fieldName": "loop",
+            "type": "boolean",
+            "description": "是否生成循环",
+            "defaultValue": false,
+            "abbr": "l"
+          },
+          {
+            "fieldName": "author",
+            "type": "String",
+            "description": "作者注释",
+            "defaultValue": "llwwhh",
+            "abbr": "a"
+          },
+          {
+            "fieldName": "outputText",
+            "type": "String",
+            "description": "输出信息",
+            "defaultValue": "lxlxlx",
+            "abbr": "o"
+          }
+
+        ]
       }
+
     ]
   }
 }

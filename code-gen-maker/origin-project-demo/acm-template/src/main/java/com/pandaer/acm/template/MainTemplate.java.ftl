@@ -6,12 +6,12 @@ import java.util.Scanner;
 /**
  * ACM 输入模板 (默认：循环获取值并求和)
  *
- * @author ${author}
+ * @author ${mainTemplate.author}
  */
 public class MainTemplate {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-<#if loop>
+<#if mainTemplate.loop>
         while (scanner.hasNext()) {
 </#if>
 
@@ -31,8 +31,8 @@ public class MainTemplate {
                 sum += num;
             }
 
-            System.out.println("${outputText}" + sum);
-<#if loop>
+            System.out.println("${mainTemplate.outputText}" + sum);
+<#if mainTemplate.loop>
         }
 </#if>
 

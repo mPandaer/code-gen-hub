@@ -36,7 +36,14 @@ public class Main {
             if (!required) {
                 continue;
             }
-            boolean isExist = argList.stream().anyMatch(arg -> Arrays.asList(names).contains(arg));
+            boolean isExist = argList.stream().anyMatch(arg -> {
+                for (String name : names) {
+                    if (arg.startsWith(name)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
             if (!isExist && names.length > 0) {
                 argList.add(names[0]);
             }
