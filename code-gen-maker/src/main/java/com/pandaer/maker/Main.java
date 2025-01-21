@@ -13,6 +13,5 @@ public class Main {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
