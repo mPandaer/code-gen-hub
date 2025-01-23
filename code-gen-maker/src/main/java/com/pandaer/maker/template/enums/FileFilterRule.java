@@ -2,6 +2,8 @@ package com.pandaer.maker.template.enums;
 
 import cn.hutool.core.util.StrUtil;
 
+import java.util.stream.Stream;
+
 /**
  * 文件过滤规则
  */
@@ -60,6 +62,11 @@ public enum FileFilterRule {
     FileFilterRule(String desc, String value) {
         this.desc = desc;
         this.value = value;
+    }
+
+
+    public static FileFilterRule getFileFilterRule(String value) {
+        return Stream.of(values()).filter(it -> it.value.equals(value)).findFirst().orElseThrow(() -> new RuntimeException("文件过滤规则不合法"));
     }
 
     public abstract boolean apply(String content,String value);

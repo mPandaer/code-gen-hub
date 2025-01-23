@@ -1,0 +1,8 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "originProjectPath": "D:/code/code-gen-hub/code-gen-maker/origin-project-demo/springboot-init"
+}

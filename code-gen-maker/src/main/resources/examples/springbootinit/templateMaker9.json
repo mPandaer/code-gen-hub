@@ -1,0 +1,53 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "makingTemplateFilesInfo": {
+    "files": [
+      {
+        "path": "src/main/java/com/yupi/springbootinit/config/Knife4jConfig.java",
+        "condition": "needDocs"
+      }
+    ]
+  },
+  "makingTemplateModelsConfig": {
+    "modelGroupConfig": {
+      "groupKey": "docsConfig",
+      "groupName": "接口文档配置",
+      "type": "DocsConfig",
+      "description": "接口文档配置",
+      "condition": "needDocs"
+    },
+    "models": [
+      {
+        "modelInfo": {
+          "fieldName": "title",
+          "type": "String",
+          "description": "接口文档标题",
+          "defaultValue": "测试标题"
+        },
+        "searchStr": "接口文档"
+      },
+      {
+        "modelInfo": {
+          "fieldName": "description",
+          "type": "String",
+          "description": "接口文档描述",
+          "defaultValue": "测试描述"
+        },
+        "searchStr": "springboot-init"
+      },
+      {
+        "modelInfo": {
+          "fieldName": "version",
+          "type": "String",
+          "description": "接口文档版本",
+          "defaultValue": "1.0"
+        },
+        "searchStr": "1.0"
+      }
+    ]
+  }
+}

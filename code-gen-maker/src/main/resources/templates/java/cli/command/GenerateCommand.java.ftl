@@ -44,9 +44,9 @@ public class GenerateCommand implements Runnable {
 
         @Override
         public void run() {
-            ${modelInfo.groupKey}.author = author;
-            ${modelInfo.groupKey}.loop = loop;
-            ${modelInfo.groupKey}.outputText = outputText;
+            <#list modelInfo.models as subModelInfo>
+                ${modelInfo.groupKey}.${subModelInfo.fieldName} = ${subModelInfo.fieldName};
+            </#list>
         }
     }
 <#else>
@@ -78,7 +78,7 @@ public class GenerateCommand implements Runnable {
         // 开始生成代码
         CodeFileGenerator codeFileGenerator = new CodeFileGenerator(dataModel);
         // 原始项目
-        String originProjectDirPath = "D:/code/code-gen-hub/code-gen-maker/origin-project-demo/acm-template";
+        String originProjectDirPath = "${fileConfig.originProjectPath}";
         File originProject = new File(originProjectDirPath);
         // 生成的项目
         String generateProjectDirPath = "generated";

@@ -22,7 +22,7 @@ public class JarGenerator {
         processBuilder.command("mvn.cmd clean package".split(" "));
         Process process = processBuilder.start();
         InputStream inputStream = process.getInputStream();
-        String info = IoUtil.readUtf8(inputStream);
+        String info = IoUtil.read(inputStream, "GBK");
         System.out.println(info);
         process.waitFor();
 

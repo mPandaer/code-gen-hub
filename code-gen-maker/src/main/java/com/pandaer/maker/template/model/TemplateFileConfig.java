@@ -1,7 +1,5 @@
 package com.pandaer.maker.template.model;
 
-import com.pandaer.maker.template.enums.FileFilterRange;
-import com.pandaer.maker.template.enums.FileFilterRule;
 import lombok.Data;
 
 import java.util.List;
@@ -14,12 +12,14 @@ public class TemplateFileConfig {
 
     private List<FileFilterConfig> fileFilterConfigs;
 
+    private String condition;
+
     @Data
     public static class FileFilterConfig {
 
-        private FileFilterRange fileFilterRange;
+        private String range;
 
-        private FileFilterRule fileFilterRule;
+        private String rule;
 
         private String value;
     }

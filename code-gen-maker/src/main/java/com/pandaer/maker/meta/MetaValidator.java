@@ -124,7 +124,8 @@ public class MetaValidator {
         }
 
         if (StrUtil.isBlank(meta.getBasePackage())) {
-            throw new ValidatedMetaException("basePackage不能为空!");
+            meta.setBasePackage("com.example");
+//            throw new ValidatedMetaException("basePackage不能为空!");
         }
 
         if (StrUtil.isBlank(meta.getVersion())) {

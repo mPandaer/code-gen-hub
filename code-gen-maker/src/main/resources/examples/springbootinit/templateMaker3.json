@@ -1,0 +1,36 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "makingTemplateFilesInfo": {
+    "fileGroupConfig": {
+      "groupKey": "post",
+      "groupName": "帖子文件组",
+      "condition": "needPost"
+    },
+    "files": {
+      "path": "",
+      "fileFilterConfigs": [
+        {
+          "range": "fileName",
+          "rule": "contains",
+          "value": "Post"
+        }
+      ]
+    }
+  },
+  "makingTemplateModelsConfig": {
+    "models": {
+      "modelInfo": {
+        "fieldName": "needPost",
+        "type": "boolean",
+        "description": "是否开启帖子的功能",
+        "defaultValue": true
+      }
+
+    }
+  }
+
+}

@@ -39,9 +39,9 @@ public class FileFilter {
         }
 
         for (TemplateFileConfig.FileFilterConfig fileFilterConfig : fileFilterConfigs) {
-            FileFilterRange fileFilterRange = fileFilterConfig.getFileFilterRange();
+            FileFilterRange fileFilterRange = FileFilterRange.getFileFilterRange(fileFilterConfig.getRange());
             String content = fileFilterRange.getContent(file);
-            FileFilterRule fileFilterRule = fileFilterConfig.getFileFilterRule();
+            FileFilterRule fileFilterRule = FileFilterRule.getFileFilterRule(fileFilterConfig.getRule());
             String value = fileFilterConfig.getValue();
             boolean result = fileFilterRule.apply(content, value);
             if (!result) {

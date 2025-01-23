@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TemplateMakerModelsConfig {
+public class MakingTemplateModelsConfig {
     private List<TemplateModelInfo> models;
 
     private ModelGroupConfig modelGroupConfig;

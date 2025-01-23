@@ -1,0 +1,27 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "makingTemplateFilesInfo": {
+    "files": [
+      {
+        "path": "src/main/java/com/yupi/springbootinit/model/dto/post/PostEsDTO.java",
+        "condition": "needPost && needEs"
+      }
+    ]
+  },
+  "makingTemplateModelsConfig": {
+    "models": [
+      {
+        "modelInfo": {
+          "fieldName": "needEs",
+          "type": "boolean",
+          "description": "是否开启ES的功能",
+          "defaultValue": true
+        }
+      }
+    ]
+  }
+}

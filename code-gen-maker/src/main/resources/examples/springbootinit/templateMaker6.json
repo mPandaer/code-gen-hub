@@ -1,0 +1,56 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "makingTemplateFilesInfo": {
+    "files": [
+      {
+        "path": "src/main/resources/application.yml"
+      }
+    ]
+  },
+  "makingTemplateModelsConfig": {
+    "modelGroupConfig": {
+      "groupKey": "mysqlConfig",
+      "groupName": "MySQL数据库配置",
+      "type": "MysqlConfig",
+      "description": "用于生成MySQL数据库配置"
+    },
+    "models": [
+      {
+        "modelInfo": {
+          "fieldName": "url",
+          "type": "String",
+          "description": "数据库URL",
+          "defaultValue": "jdbc:mysql://localhost:3306/test"
+        },
+        "searchStr": "jdbc:mysql://localhost:3306/my_db"
+      },
+      {
+        "modelInfo": {
+          "fieldName": "username",
+          "type": "String",
+          "description": "数据库用户名",
+          "defaultValue": "root"
+        },
+        "searchStr": "root"
+      },
+      {
+        "modelInfo": {
+          "fieldName": "password",
+          "type": "String",
+          "description": "数据库密码",
+          "defaultValue": "101807"
+        },
+        "searchStr": "123456"
+      }
+
+    ]
+
+
+    }
+
+
+}

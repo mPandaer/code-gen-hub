@@ -1,0 +1,37 @@
+{
+  "workspaceId": "1",
+  "meta": {
+    "name": "springboot-generator",
+    "description": "SpringBoot初始化模板的代码生成器"
+  },
+  "makingTemplateFilesInfo": {
+    "files": [
+      {
+        "path": "src/main/resources/application.yml"
+      },
+      {
+        "path": "src/main/java/com/yupi/springbootinit/MainApplication.java"
+      },
+      {
+        "path": "pom.xml"
+      }
+    ]
+  },
+  "makingTemplateModelsConfig": {
+    "models": [
+      {
+        "modelInfo": {
+          "fieldName": "needRedis",
+          "type": "boolean",
+          "description": "是否开启Redis功能",
+          "defaultValue": true
+        }
+      }
+
+    ]
+
+
+    }
+
+
+}
