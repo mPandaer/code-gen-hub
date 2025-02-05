@@ -10,6 +10,7 @@ const Settings: ProLayoutProps & {
   navTheme: 'light',
   // 拂晓蓝
   colorPrimary: '#1890ff',
+  waterMarkProps:false,
   layout: 'top',
   contentWidth: 'Fluid',
   fixedHeader: true,
