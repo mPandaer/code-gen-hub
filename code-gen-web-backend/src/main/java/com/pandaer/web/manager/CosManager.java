@@ -1,10 +1,15 @@
 package com.pandaer.web.manager;
 
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.pandaer.web.config.CosClientConfig;
 import java.io.File;
+import java.io.InputStream;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +27,23 @@ public class CosManager {
 
     @Resource
     private COSClient cosClient;
+
+
+    /**
+     * 下载对象
+     * @param key
+     * @return
+     */
+    public COSObject getObject(String key) {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(cosClientConfig.getBucket(), key);
+        try {
+            return cosClient.getObject(getObjectRequest);
+        } catch (CosClientException e) {
+           throw new RuntimeException(e);
+        }
+    }
+
+
 
     /**
      * 上传对象

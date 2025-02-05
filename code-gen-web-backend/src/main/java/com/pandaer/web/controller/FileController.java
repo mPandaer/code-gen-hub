@@ -1,6 +1,7 @@
 package com.pandaer.web.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.PathUtil;
 import com.pandaer.web.common.BaseResponse;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.common.ResultUtils;
@@ -12,15 +13,20 @@ import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.enums.FileUploadBizEnum;
 import com.pandaer.web.service.UserService;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -39,6 +45,71 @@ public class FileController {
 
     @Resource
     private CosManager cosManager;
+
+
+
+
+    /**
+     * 测试文件上传
+     */
+    @PostMapping("/test/upload")
+    public BaseResponse<String> testUpdateFile(@RequestPart("file") MultipartFile multipartFile) {
+        String originalFilename = multipartFile.getOriginalFilename();
+
+        // 文件目录：根据业务、用户来划分
+        String filepath = String.format("/test/%s",originalFilename);
+        File file = null;
+        try {
+            // 上传文件
+            file = File.createTempFile(filepath, null);
+            multipartFile.transferTo(file);
+            cosManager.putObject(filepath, file);
+            // 返回可访问地址
+            return ResultUtils.success(FileConstant.COS_HOST + filepath);
+        } catch (Exception e) {
+            log.error("file upload error, filepath = " + filepath, e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
+        } finally {
+            if (file != null) {
+                // 删除临时文件
+                boolean delete = file.delete();
+                if (!delete) {
+                    log.error("file delete error, filepath = {}", filepath);
+                }
+            }
+        }
+    }
+
+
+
+
+    /**
+     * 测试文件下载
+     */
+    @GetMapping("/test/download")
+    public void testFileDownload(String filePath, HttpServletResponse response) throws IOException {
+        COSObject object = cosManager.getObject(filePath);
+        COSObjectInputStream objectContent = object.getObjectContent();
+        byte[] byteArray = IOUtils.toByteArray(objectContent);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        String fileName = PathUtil.getName(Paths.get(filePath));
+        response.setHeader("Content-Disposition", "attachment;filename=" +fileName );
+        response.getOutputStream().write(byteArray);
+        response.getOutputStream().flush();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 文件上传
