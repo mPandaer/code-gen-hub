@@ -77,6 +77,11 @@ declare namespace API {
     type?: string;
   };
 
+  type fileDownloadUsingGETParams = {
+    /** filePath */
+    filePath?: string;
+  };
+
   type FileInfo = {
     condition?: string;
     files?: FileInfo[];

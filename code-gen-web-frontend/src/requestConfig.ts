@@ -35,6 +35,13 @@ export const requestConfig: RequestConfig = {
       // 请求地址
       const requestPath: string = response.config.url ?? '';
 
+      const contentType = response.headers['content-type'];
+      console.log(contentType)
+      if (contentType.includes("application/octet-stream")) {
+        console.log("type: ",contentType)
+        return response;
+      }
+
       // 响应
       const { data } = response as unknown as ResponseStructure;
       if (!data) {

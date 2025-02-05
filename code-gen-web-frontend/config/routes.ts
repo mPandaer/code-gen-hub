@@ -20,5 +20,8 @@ export default [
     ],
   },
   { path: '/', redirect: '/welcome' },
+  { path: '/generator/add',icon: 'plus', component: "./Generator/Add",name: "新建生成器"},
+  { path: '/generator/edit/:id', component: "./Generator/Add",name: "编辑生成器",hideInMenu: true},
+  { path: '/generator/detail/:id', component: "./Generator/Detail",name: "生成器详情",hideInMenu: true},
   { path: '*', layout: false, component: './404' },
 ];

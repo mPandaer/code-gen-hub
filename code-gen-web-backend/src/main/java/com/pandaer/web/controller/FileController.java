@@ -2,6 +2,7 @@ package com.pandaer.web.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.util.URLUtil;
 import com.pandaer.web.common.BaseResponse;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.common.ResultUtils;
@@ -12,14 +13,6 @@ import com.pandaer.web.model.dto.file.UploadFileRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.enums.FileUploadBizEnum;
 import com.pandaer.web.service.UserService;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
@@ -29,11 +22,17 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 /**
  * 文件接口
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @RestController
 @RequestMapping("/file")
@@ -47,47 +46,13 @@ public class FileController {
     private CosManager cosManager;
 
 
-
-
     /**
-     * 测试文件上传
+     * 文件下载
      */
-    @PostMapping("/test/upload")
-    public BaseResponse<String> testUpdateFile(@RequestPart("file") MultipartFile multipartFile) {
-        String originalFilename = multipartFile.getOriginalFilename();
-
-        // 文件目录：根据业务、用户来划分
-        String filepath = String.format("/test/%s",originalFilename);
-        File file = null;
-        try {
-            // 上传文件
-            file = File.createTempFile(filepath, null);
-            multipartFile.transferTo(file);
-            cosManager.putObject(filepath, file);
-            // 返回可访问地址
-            return ResultUtils.success(FileConstant.COS_HOST + filepath);
-        } catch (Exception e) {
-            log.error("file upload error, filepath = " + filepath, e);
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
-        } finally {
-            if (file != null) {
-                // 删除临时文件
-                boolean delete = file.delete();
-                if (!delete) {
-                    log.error("file delete error, filepath = {}", filepath);
-                }
-            }
-        }
-    }
-
-
-
-
-    /**
-     * 测试文件下载
-     */
-    @GetMapping("/test/download")
-    public void testFileDownload(String filePath, HttpServletResponse response) throws IOException {
+    @GetMapping("/download")
+    public void fileDownload(String filePath, HttpServletResponse response) throws IOException {
+        // 为了防止filepath是一个绝对的URL，需要做一下处理
+        filePath = URLUtil.decode(filePath);
         COSObject object = cosManager.getObject(filePath);
         COSObjectInputStream objectContent = object.getObjectContent();
         byte[] byteArray = IOUtils.toByteArray(objectContent);
@@ -97,18 +62,6 @@ public class FileController {
         response.getOutputStream().write(byteArray);
         response.getOutputStream().flush();
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -122,7 +75,10 @@ public class FileController {
     @PostMapping("/upload")
     public BaseResponse<String> uploadFile(@RequestPart("file") MultipartFile multipartFile,
             UploadFileRequest uploadFileRequest, HttpServletRequest request) {
+
+        // 业务标识，判断这个图片的用处
         String biz = uploadFileRequest.getBiz();
+
         FileUploadBizEnum fileUploadBizEnum = FileUploadBizEnum.getEnumByValue(biz);
         if (fileUploadBizEnum == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -167,6 +123,7 @@ public class FileController {
         // 文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         final long ONE_M = 1024 * 1024L;
+        // TODO 针对代码生成器的封面或者代码文件的一些限制？？？
         if (FileUploadBizEnum.USER_AVATAR.equals(fileUploadBizEnum)) {
             if (fileSize > ONE_M) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件大小不能超过 1M");

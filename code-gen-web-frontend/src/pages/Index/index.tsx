@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
+import {Link} from "umi";
 
 dayjs.extend(relativeTime);
 
@@ -114,30 +115,33 @@ const IndexPage: React.FC<any> = () => {
         dataSource={dataList}
         renderItem={(item) => (
           <List.Item>
-            <Card
-              hoverable
-              style={{ height: '100%' }}
-              cover={<img alt={item.name} src={item.picture} />}
-            >
-              <Card.Meta
-                title={<a>{item.name}</a>}
-                description={
-                  <Typography.Paragraph
-                    ellipsis={{
-                      rows: 2,
-                    }}
-                  >
-                    {item.description}
-                  </Typography.Paragraph>
-                }
-              />
-              <div>{item.tags && item.tags.map((tag: any) => <Tag key={tag}>{tag}</Tag>)}</div>
+            <Link to={`/generator/detail/${item.id}`}>
+              <Card
+                hoverable
+                style={{ height: '100%' }}
+                cover={<img alt={item.name} src={item.picture} />}
+              >
+                <Card.Meta
+                  title={<a>{item.name}</a>}
+                  description={
+                    <Typography.Paragraph
+                      ellipsis={{
+                        rows: 2,
+                      }}
+                    >
+                      {item.description}
+                    </Typography.Paragraph>
+                  }
+                />
+                <div>{item.tags && item.tags.map((tag: any) => <Tag key={tag}>{tag}</Tag>)}</div>
 
-              <Flex justify={'space-between'} align={'center'}>
-                <Typography.Text type={"secondary"}>{dayjs(item.updateTime).fromNow()}</Typography.Text>
-                <Avatar src={item.user?.userAvatar} />
-              </Flex>
-            </Card>
+                <Flex justify={'space-between'} align={'center'}>
+                  <Typography.Text type={"secondary"}>{dayjs(item.updateTime).fromNow()}</Typography.Text>
+                  <Avatar src={item.user?.userAvatar} />
+                </Flex>
+              </Card>
+            </Link>
+
           </List.Item>
         )}
       />

@@ -2,6 +2,21 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
+/** fileDownload GET /api/file/download */
+export async function fileDownloadUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.fileDownloadUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/file/download', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** uploadFile POST /api/file/upload */
 export async function uploadFileUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

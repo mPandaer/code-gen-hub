@@ -11,14 +11,14 @@ import com.pandaer.web.config.CosClientConfig;
 import java.io.File;
 import java.io.InputStream;
 import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * Cos 对象存储操作
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
+@Slf4j
 @Component
 public class CosManager {
 
@@ -31,15 +31,15 @@ public class CosManager {
 
     /**
      * 下载对象
-     * @param key
+     * @param url 对象存储的文件路径
      * @return
      */
-    public COSObject getObject(String key) {
-        GetObjectRequest getObjectRequest = new GetObjectRequest(cosClientConfig.getBucket(), key);
+    public COSObject getObject(String url) {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(cosClientConfig.getBucket(), url);
         try {
             return cosClient.getObject(getObjectRequest);
         } catch (CosClientException e) {
-           throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
