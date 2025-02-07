@@ -8,6 +8,9 @@ import com.pandaer.web.model.entity.Generator;
 import com.pandaer.web.model.vo.GeneratorVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 帖子服务
@@ -50,4 +53,6 @@ public interface GeneratorService extends IService<Generator> {
      * @return
      */
     Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request);
+
+    File useGenerator(Generator generator, String distPath, Map<String, Object> dataModel) throws IOException, InterruptedException;
 }

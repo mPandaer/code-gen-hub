@@ -33,11 +33,12 @@ public abstract class MakerTemplate {
         System.out.println("04 生成产物包完毕！");
     }
 
-    protected abstract void generateDistPackage(String madeGeneratorDir, Meta meta, String jarPath);
+    protected abstract String generateDistPackage(String madeGeneratorDir, Meta meta, String jarPath);
 
     protected abstract String generateScriptFiles(Meta meta, String madeGeneratorDir);
 
     protected abstract void buildJar(String madeGeneratorDir) throws IOException, InterruptedException;
 
     protected abstract String generateFile(Meta meta);
+
 }

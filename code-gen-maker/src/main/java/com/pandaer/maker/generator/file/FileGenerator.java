@@ -91,6 +91,13 @@ public class FileGenerator {
         FileUtil.mkParentDirs(outputPath);
         DynamicFileGenerator.generate(new File(inputPath),new File(outputPath),meta);
 
+        // 生成 JsonGenerateCommand.java
+        inputPath = generatorTemplatesDir.getAbsolutePath() + File.separator + "java/cli/command/JsonGenerateCommand.java.ftl";
+        outputPath = madeGeneratorDir.getAbsolutePath() + File.separator + "src/main/java/" + basePackagePath + "/acm/cli/command/JsonGenerateCommand.java";
+        // 确保父目录存在
+        FileUtil.mkParentDirs(outputPath);
+        DynamicFileGenerator.generate(new File(inputPath),new File(outputPath),meta);
+
 
         // 生成 CommandExecutor.java
         inputPath = generatorTemplatesDir.getAbsolutePath() + File.separator + "java/cli/CommandExecutor.java.ftl";

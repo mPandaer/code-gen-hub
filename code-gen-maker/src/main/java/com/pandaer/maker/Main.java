@@ -6,9 +6,9 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        DefaultGeneratorMaker defaultGeneratorMaker = new DefaultGeneratorMaker();
+        MakerTemplate maker = new ZipGeneratorMaker();
         try {
-            defaultGeneratorMaker.make();
+            maker.make();
             System.out.println("代码生成器制作完毕！");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

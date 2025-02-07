@@ -20,15 +20,18 @@ public class DefaultGeneratorMaker extends MakerTemplate {
 
 
     @Override
-    protected void generateDistPackage(String madeGeneratorDir, Meta meta, String jarPath) {
+    protected String generateDistPackage(String madeGeneratorDir, Meta meta, String jarPath) {
         DistPackageGenerator distPackageGenerator = new DistPackageGenerator();
         DistPackageConfig distPackageConfig = new DistPackageConfig();
-        distPackageConfig.setDistPackagePath(madeGeneratorDir + "-dist");
+        String distPackagePath = madeGeneratorDir + "-dist";
+        distPackageConfig.setDistPackagePath(distPackagePath);
         String projectTemplatesDirPath = madeGeneratorDir + File.separator + ".source/" + FileUtil.getLastPathEle(Paths.get(meta.getFileConfig().getOriginProjectPath()));
         distPackageConfig.setProjectTemplatesDirPath(projectTemplatesDirPath);
         distPackageConfig.setMadeGeneratorJarPath(madeGeneratorDir + File.separator + jarPath);
-        distPackageConfig.setScriptFilePath(madeGeneratorDir + File.separator + meta.getName());
+        // TODO 这里的脚步文件名字写死
+        distPackageConfig.setScriptFilePath(madeGeneratorDir + File.separator + "generator");
         distPackageGenerator.generator(distPackageConfig);
+        return distPackagePath;
     }
 
     @Override

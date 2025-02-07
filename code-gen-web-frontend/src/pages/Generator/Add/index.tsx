@@ -19,6 +19,7 @@ import {
   getGeneratorVoByIdUsingGet
 } from "@/services/backend/generatorController";
 import {useModel, useParams} from "@@/exports";
+import ModelConfigFrom from "@/pages/Generator/components/ModelConfigFrom";
 
 
 
@@ -151,15 +152,18 @@ const AddGeneratorPage: React.FC = () => {
           </StepsForm.StepForm>
 
 
-          {/*TODO 第三步 模型配置信息*/}
           <StepsForm.StepForm
-            name="modleConfig"
+            name="modelConfig"
             title="模型配置信息"
           >
-            {/*模型配置信息*/}
+            <ProFormItem>
+              <ModelConfigFrom
+                formRef={formRef}
+                oldData={originInfo}
+              />
+            </ProFormItem>
           </StepsForm.StepForm>
 
-          {/*TODO 第四步 上传产物包*/}
           <StepsForm.StepForm
             name="dist"
             title="生成器压缩文件"

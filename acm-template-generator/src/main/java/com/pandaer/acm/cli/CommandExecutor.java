@@ -2,11 +2,12 @@ package com.pandaer.acm.cli;
 
 import com.pandaer.acm.cli.command.ConfigCommand;
 import com.pandaer.acm.cli.command.GenerateCommand;
+import com.pandaer.acm.cli.command.JsonGenerateCommand;
 import com.pandaer.acm.cli.command.ListCommand;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "acm-template", description = "Acm代码生成器", mixinStandardHelpOptions = true,subcommands = {
-        ConfigCommand.class, GenerateCommand.class, ListCommand.class
+        ConfigCommand.class, GenerateCommand.class, ListCommand.class, JsonGenerateCommand.class
 })
 public class CommandExecutor implements Runnable {
     @Override

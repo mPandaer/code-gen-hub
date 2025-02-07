@@ -14,7 +14,7 @@ public class ScriptGenerator {
         String winCommand = String.format(winCommandTemplate,jarPath);
         String unixCommandTemplate = "#! /bin/bash\njava -jar %s \"$@\"";
         String unixCommand = String.format(unixCommandTemplate,jarPath);
-        FileUtil.writeString(unixCommand,madeGeneratorDir.getAbsolutePath() + File.separator + scriptName, "UTF-8");
-        FileUtil.writeString(winCommand,madeGeneratorDir.getAbsolutePath() + File.separator + scriptName + ".bat", "UTF-8");
+        FileUtil.writeString(unixCommand,madeGeneratorDir.getAbsolutePath() + File.separator + "generator", "UTF-8");
+        FileUtil.writeString(winCommand,madeGeneratorDir.getAbsolutePath() + File.separator + "generator" + ".bat", "UTF-8");
     }
 }
