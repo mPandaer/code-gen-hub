@@ -137,7 +137,7 @@ const FileConfigPage: React.FC<FileConfigPageProps> = ({ value, onChange }) => {
     if (!isEqual && onChange) {
       onChange(fileInfo);
     }
-  }, [treeData, onChange, value]);
+  }, [treeData]);
 
   const [form] = Form.useForm();
 

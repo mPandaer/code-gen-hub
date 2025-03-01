@@ -157,23 +157,24 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         //  将代码生成器文件返回给前端
 
         // 获取到生成器压缩包的路径
-        String localZipGeneratorPath = currentMakerWorkspace + "/made-dist.zip";
+
+        // 压缩代码生成器
+        File zippedGeneratorFile = ZipUtil.zip(madeGeneratorPath + "-dist");
 
         // 返回给前端
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        String fileName = "made-dist.zip";
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        response.setHeader("Content-Disposition", "attachment;filename=" + zippedGeneratorFile.getName());
         try {
-            Files.copy(Paths.get(localZipGeneratorPath), response.getOutputStream());
+            Files.copy(zippedGeneratorFile.toPath(), response.getOutputStream());
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "传输生成器压缩包异常");
         }
 
 
         // 异步 清理工作空间
-        CompletableFuture.runAsync(() -> {
-            FileUtil.del(currentMakerWorkspace);
-        });
+//        CompletableFuture.runAsync(() -> {
+//            FileUtil.del(currentMakerWorkspace);
+//        });
 
 
     }

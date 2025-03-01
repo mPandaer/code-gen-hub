@@ -130,11 +130,11 @@ public class FileGenerator {
 
 
         // 生成 README.md
-        inputPath = generatorTemplatesDir.getAbsolutePath() + File.separator + "README.md.ftl";
+        inputPath = "/templates/README.md.ftl";
         outputPath = madeGeneratorDir.getAbsolutePath() + File.separator + "README.md";
         // 确保父目录存在
         FileUtil.mkParentDirs(outputPath);
-        DynamicFileGenerator.generate(new File(inputPath),new File(outputPath),meta);
+        DynamicFileGenerator.generateByClassPath(inputPath,new File(outputPath),meta);
 
 
     }

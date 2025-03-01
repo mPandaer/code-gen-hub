@@ -14,7 +14,7 @@ public class ListCommand implements Runnable {
     @Override
     public void run() {
         // 原始项目
-        String originProjectDirPath = "${fileConfig.originProjectPath}";
+        String originProjectDirPath = ".source/templates";
         File originProject = new File(originProjectDirPath);
 
         // 输出文件列表信息

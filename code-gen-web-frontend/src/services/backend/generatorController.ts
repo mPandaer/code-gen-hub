@@ -92,6 +92,21 @@ export async function listGeneratorVoByPageUsingPost(
   });
 }
 
+/** makeGeneratorOnline POST /api/generator/make */
+export async function makeGeneratorOnlineUsingPost(
+  body: API.MakingGeneratorRequest,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/make', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** listMyGeneratorVOByPage POST /api/generator/my/list/page/vo */
 export async function listMyGeneratorVoByPageUsingPost(
   body: API.GeneratorQueryRequest,
@@ -113,6 +128,21 @@ export async function updateGeneratorUsingPost(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/generator/update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** useGeneratorByIdOnline POST /api/generator/use */
+export async function useGeneratorByIdOnlineUsingPost(
+  body: API.UseGeneratorRequest,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/use', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -53,9 +53,9 @@ public class MetaValidator {
         }
 
 
-//        if (StrUtil.isBlank(fileConfig.getOriginProjectPath())) {
-//            throw new ValidatedMetaException("原始项目路径 (originProjectPath) 不能为为空");
-//        }
+        if (StrUtil.isBlank(fileConfig.getOriginProjectPath())) {
+            fileConfig.setOriginProjectPath(".source");
+        }
 
 
         if (StrUtil.isBlank(fileConfig.getGeneratedProjectPath())) {

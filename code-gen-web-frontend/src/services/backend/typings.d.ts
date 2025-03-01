@@ -217,6 +217,22 @@ declare namespace API {
     userRole?: string;
   };
 
+  type MakingGeneratorRequest = {
+    meta?: Meta;
+    zipTemplateFilesUrl?: string;
+  };
+
+  type Meta = {
+    author?: string;
+    basePackage?: string;
+    createTime?: string;
+    description?: string;
+    fileConfig?: FileConfig;
+    modelConfig?: ModelConfig;
+    name?: string;
+    version?: string;
+  };
+
   type ModelConfig = {
     models?: ModelInfo[];
   };
@@ -293,6 +309,11 @@ declare namespace API {
 
   type uploadFileUsingPOSTParams = {
     biz?: string;
+  };
+
+  type UseGeneratorRequest = {
+    dataModel?: Record<string, any>;
+    id?: number;
   };
 
   type User = {

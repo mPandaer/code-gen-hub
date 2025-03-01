@@ -13,7 +13,8 @@ public enum FileUploadBizEnum {
 
     USER_AVATAR("用户头像", "user_avatar"),
     GENERATOR_COVER("代码生成器封面", "generator_cover"),
-    GENERATOR_DIST("代码生成器产物包", "generator_dist")
+    GENERATOR_DIST("代码生成器产物包", "generator_dist"),
+    GENERATOR_TEMPLATE("代码生成器模板文件压缩包", "generator_template")
 
     ;
 

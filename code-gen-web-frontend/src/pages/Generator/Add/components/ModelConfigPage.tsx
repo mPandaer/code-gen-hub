@@ -39,7 +39,7 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
   console.log("ModelConfigPage value", value);
 
   const modelInfoToTreeData = (modelInfo: ModelInfo): CustomDataNode => {
-    if (modelInfo.type === 'group') {
+    if (modelInfo.groupKey) {
       return {
         key: modelInfo.id,
         title: `📁 ${modelInfo.groupName} (${modelInfo.groupKey})`,
@@ -126,7 +126,7 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
     if (!isEqual && onChange) {
       onChange(modelInfo);
     }
-  }, [treeData]);
+  }, [treeData]); // treeData
 
 
 
@@ -146,7 +146,6 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
   const handleAddGroup = () => {
     const newGroup: ModelInfo = {
       id: uuidv4(),
-      type: 'group',
       groupKey: 'newGroup',
       groupName: '新分组',
       models: []
@@ -159,7 +158,6 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
   const handleAddModel = (parentNode?: CustomDataNode) => {
     const newModel: ModelInfo = {
       id: uuidv4(),
-      type: 'model',
       fieldName: 'newField',
       type: 'String',
       description: '请输入描述',
@@ -235,12 +233,12 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
     });
 
     // Prevent model from having children
-    if (info.node.data.type === 'model') {
+    if (!info.node.data.groupKey) {
       return;
     }
 
     // Prevent group from being nested in another group
-    if (dragObj.data.type === 'group' && info.node.data.type === 'group') {
+    if (dragObj.data.groupKey && info.node.data.groupKey) {
       return;
     }
 
@@ -411,7 +409,7 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
               }}>
                 <Popconfirm
                   title="确定要删除吗？"
-                  description={selectedNode.type === 'group' ? 
+                  description={selectedNode.groupKey? 
                     "删除分组将同时删除其下所有模型" : 
                     "确定要删除这个模型吗？"}
                   onConfirm={() => selectedKey && handleDelete(selectedKey)}
@@ -422,12 +420,12 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
                     danger 
                     icon={<DeleteOutlined />}
                   >
-                    删除{selectedNode.type === 'group' ? '分组' : '模型'}
+                    删除{selectedNode.groupKey? '分组' : '模型'}
                   </Button>
                 </Popconfirm>
               </div>
 
-              {selectedNode.type === 'group' ? (
+              {selectedNode.groupKey ? (
                 // Group Config
                 <>
                   <Form.Item label="分组名称" name="groupName">
@@ -446,7 +444,7 @@ const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ value, onChange }) =>
                   <Form.Item label="字段名" name="fieldName">
                     <Input />
                   </Form.Item>
-                  <Form.Item label="字段类型" name="fieldType" initialValue={selectedNode?.type}>
+                  <Form.Item label="字段类型" name="type">
                     <Radio.Group>
                       <Radio value="String">String</Radio>
                       <Radio value="boolean">boolean</Radio>

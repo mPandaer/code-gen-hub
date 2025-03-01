@@ -9,13 +9,14 @@ import {UploadFile} from "antd/es/upload/interface";
 interface FileUploaderProps {
   id?: string;
   value?: string;
+  biz?: string;
   onChange?: (value: string) => void;
 }
 
 
 const FileUploader: React.FC<FileUploaderProps> = (props) => {
 
-  const {id,value,onChange} = props;
+  const {id,value,onChange,biz} = props;
 
   const name = value?.substring(value.lastIndexOf('/') + 1)
 
@@ -33,7 +34,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
     customRequest: async (options) => {
       const file = options.file
       // @ts-ignore
-      const resp = await uploadFileUsingPost({biz:"generator_dist"},{},file)
+      const resp = await uploadFileUsingPost({biz:biz},{},file)
       if (onChange) {
         onChange(resp.data as string)
       }

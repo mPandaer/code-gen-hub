@@ -9,7 +9,7 @@ import java.io.File;
 
 <#macro generateFile indent fileInfo>
 ${indent}// 生成文件
-${indent}inputPath = originProject.getAbsolutePath() + File.separator + "${fileInfo.inputPath}";
+${indent}inputPath = ".source/templates" + File.separator + "${fileInfo.inputPath}";
 ${indent}outputPath = generateProject.getAbsolutePath() + File.separator + "${fileInfo.outputPath}";
 ${indent}// 保证outputPath的父目录存在
 ${indent}FileUtil.mkParentDirs(outputPath);
