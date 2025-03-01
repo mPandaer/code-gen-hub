@@ -7,7 +7,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.pandaer.web.meta.Meta;
+import com.pandaer.maker.meta.Meta;
 import lombok.Data;
 
 /**

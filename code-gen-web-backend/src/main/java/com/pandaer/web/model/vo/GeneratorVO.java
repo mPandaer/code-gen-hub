@@ -1,7 +1,7 @@
 package com.pandaer.web.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.pandaer.web.meta.Meta;
+import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.entity.Generator;
 
 import java.io.Serializable;

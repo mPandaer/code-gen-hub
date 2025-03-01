@@ -3,7 +3,12 @@ package com.pandaer.web.model.dto.generator;
 import java.io.Serializable;
 import java.util.List;
 
-import com.pandaer.web.meta.Meta;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.json.JSONUtil;
+import com.pandaer.maker.meta.Meta;
+import com.pandaer.web.model.entity.Generator;
 import lombok.Data;
 
 /**
@@ -68,5 +73,30 @@ public class GeneratorEditRequest implements Serializable {
      * 代码生成器产物路径
      */
     private String distPath;
+
+
+    public Generator toGenerator() {
+        Generator generator = BeanUtil.toBean(this, Generator.class);
+
+        if (CollUtil.isNotEmpty(tags)) {
+            // 转换tag
+            generator.setTags(JSONUtil.toJsonStr(tags));
+        }
+
+        if (ObjUtil.isNotEmpty(fileConfig)) {
+            // 转换fileConfig
+            generator.setFileConfig(JSONUtil.toJsonStr(fileConfig));
+        }
+
+        if (ObjUtil.isNotEmpty(modelConfig)) {
+            // 转换modelConfig
+            generator.setModelConfig(JSONUtil.toJsonStr(modelConfig));
+        }
+
+        return generator;
+
+    }
+
+
 
 }

@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pandaer.web.model.dto.generator.GeneratorQueryRequest;
+import com.pandaer.web.model.dto.generator.MakingGeneratorRequest;
 import com.pandaer.web.model.entity.Generator;
 import com.pandaer.web.model.vo.GeneratorVO;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -54,4 +56,6 @@ public interface GeneratorService extends IService<Generator> {
     Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request);
 
     File useGenerator(Generator generator, String distPath, Map<String, Object> dataModel) throws IOException, InterruptedException;
+
+    void makeGenerator(MakingGeneratorRequest makingGeneratorRequest, HttpServletResponse response);
 }

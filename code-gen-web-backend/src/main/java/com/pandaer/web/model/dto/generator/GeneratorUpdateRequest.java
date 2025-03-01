@@ -3,7 +3,7 @@ package com.pandaer.web.model.dto.generator;
 import java.io.Serializable;
 import java.util.List;
 
-import com.pandaer.web.meta.Meta;
+import com.pandaer.maker.meta.Meta;
 import lombok.Data;
 
 /**

@@ -24,8 +24,19 @@ public class Meta {
     @NoArgsConstructor
     @Data
     public static class FileConfig {
+        /**
+         * 原始模板项目路径
+         */
         private String originProjectPath;
+
+        /**
+         * 生成定制化项目的路径
+         */
         private String generatedProjectPath;
+
+        /**
+         * 制作好的生成器路径
+         */
         private String generatorPath;
         private String type;
         private List<FileInfo> files;

@@ -1,13 +1,14 @@
-
 import {
   PageContainer,
   ProCard,
-  ProFormInstance, ProFormItem,
+  ProFormInstance,
+  ProFormItem,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-components';
+import { Form } from 'antd';
 import '@umijs/max';
 import { message } from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
@@ -18,8 +19,9 @@ import {
   editGeneratorUsingPost,
   getGeneratorVoByIdUsingGet
 } from "@/services/backend/generatorController";
-import {useModel, useParams} from "@@/exports";
-import ModelConfigFrom from "@/pages/Generator/components/ModelConfigFrom";
+import {useParams} from "@@/exports";
+import FileConfigPage from '@/pages/Generator/Add/components/FileConfigPage';
+import ModelConfigPage from './components/ModelConfigPage';
 
 
 
@@ -32,15 +34,24 @@ const AddGeneratorPage: React.FC = () => {
   const formRef = useRef<ProFormInstance>();
   const {id} = useParams();
   const [originInfo, setOriginInfo] = useState<API.GeneratorVO>();
+  const [loading, setLoading] = useState<boolean>(false);
 
 
   const loadOriginInfo = async () => {
     if (id) {
-      const resp = await getGeneratorVoByIdUsingGet({id:Number(id)})
-      formRef.current?.setFieldsValue(resp.data)
-      setOriginInfo(resp.data)
+      setLoading(true);
+      try {
+        const resp = await getGeneratorVoByIdUsingGet({id:Number(id)});
+        if (resp.data) {
+          formRef.current?.setFieldsValue(resp.data);
+          setOriginInfo(resp.data);
+        }
+      } catch (error) {
+        message.error('加载数据失败');
+      } finally {
+        setLoading(false);
+      }
     }
-
   }
 
   useEffect(() => {
@@ -49,8 +60,8 @@ const AddGeneratorPage: React.FC = () => {
 
 
   return (
-    <PageContainer >
-      <ProCard>
+    <PageContainer>
+      <ProCard style={{ marginTop: '8vh' }}>
         <StepsForm<API.GeneratorAddRequest>
           formRef={formRef}
           onFinish={async (values) => {
@@ -140,29 +151,66 @@ const AddGeneratorPage: React.FC = () => {
 
 
           {/* TODO 第二步 文件信息 */}
-          <StepsForm.StepForm
-            name="fileConfig"
-            title="文件配置信息"
-            onFinish={async () => {
-              console.log(formRef.current?.getFieldsValue());
-              return true;
-            }}
-          >
-            {/*文件配置信息*/}
-          </StepsForm.StepForm>
+          {
+            (!id ||originInfo?.fileConfig?.files) && (
+                  <StepsForm.StepForm
+                              name="fileConfig"
+                              title="文件配置信息"
+                              initialValues={{
+                                fileConfig: {
+                                  files: originInfo?.fileConfig?.files || []
+                                }
+                              }}
+                              onFinish={async () => {
+                                const values = formRef.current?.getFieldsValue();
+                                console.log("文件配置信息", values);
+                                return true;
+                              }}
+                            >
+                              <Form.Item name={['fileConfig', 'files']}>
+                                <FileConfigPage 
+                                  value={formRef.current?.getFieldValue(['fileConfig', 'files'])} 
+                                  onChange={(files) => {
+                                    formRef.current?.setFieldValue(['fileConfig', 'files'], files);
+                                  }}
+                                />
+                              </Form.Item>
+                            </StepsForm.StepForm>
+            )
+          }
 
 
-          <StepsForm.StepForm
-            name="modelConfig"
-            title="模型配置信息"
-          >
-            <ProFormItem>
-              <ModelConfigFrom
-                formRef={formRef}
-                oldData={originInfo}
-              />
-            </ProFormItem>
-          </StepsForm.StepForm>
+
+          {
+            (!id ||originInfo?.modelConfig?.models) && (
+              <StepsForm.StepForm
+              name="modelConfig"
+              title="模型配置信息"
+              initialValues={{
+                modelConfig: {
+                  models: originInfo?.modelConfig?.models || []
+                }
+              }}
+              onFinish={async () => {
+                const values = formRef.current?.getFieldsValue();
+                console.log("模型配置信息", values);
+                return true;
+              }}
+            >
+              <ProFormItem
+                name={['modelConfig', 'models']}
+              >
+                <ModelConfigPage 
+                  value={formRef.current?.getFieldValue(['modelConfig', 'models'])}
+                  onChange={(models) => {
+                    formRef.current?.setFieldValue(['modelConfig', 'models'], models);
+                  }}
+                />
+              </ProFormItem>
+            </StepsForm.StepForm>
+            )
+          }
+          
 
           <StepsForm.StepForm
             name="dist"

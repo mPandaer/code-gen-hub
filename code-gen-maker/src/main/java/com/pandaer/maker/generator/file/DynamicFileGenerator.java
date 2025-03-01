@@ -1,6 +1,7 @@
 package com.pandaer.maker.generator.file;
 
 import com.pandaer.maker.meta.Meta;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -31,6 +32,36 @@ public class DynamicFileGenerator {
             throw new RuntimeException(e);
         }
 
+    }
+
+    /**
+     *
+     * @param templateFileClassPath /templates/java/xxx/xxx/aa.java.ftl
+     * @param generatedFile
+     * @param dataModel
+     */
+    public static void generateByClassPath(String templateFileClassPath,File generatedFile,Meta dataModel) {
+
+        int index = templateFileClassPath.lastIndexOf("/");
+        String basePackage = templateFileClassPath.substring(0,index);
+        String templateFileName = templateFileClassPath.substring(index + 1);
+
+        Configuration cfg = null;
+        try {
+            cfg = new Configuration(Configuration.VERSION_2_3_34);
+            cfg.setTemplateLoader(new ClassTemplateLoader(DynamicFileGenerator.class,basePackage));
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setLogTemplateExceptions(false);
+            cfg.setWrapUncheckedExceptions(true);
+            cfg.setFallbackOnNullLoopVariable(false);
+            cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
+            Template template = cfg.getTemplate(templateFileName);
+            // 渲染模板
+            template.process(dataModel,new OutputStreamWriter(Files.newOutputStream(generatedFile.toPath()), StandardCharsets.UTF_8));
+        } catch (IOException | TemplateException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

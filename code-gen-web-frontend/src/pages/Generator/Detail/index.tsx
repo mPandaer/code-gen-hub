@@ -67,12 +67,12 @@ const DetailGeneratorPage: React.FC = () => {
     {
       key: '2',
       label: '文件配置',
-      children: <FileInfoTab/>,
+      children: <FileInfoTab {...generatorInfo?.fileConfig}/>,
     },
     {
       key: '3',
       label: '模型配置',
-      children: <ModelInfoTab/>,
+      children: <ModelInfoTab {...generatorInfo?.modelConfig}/>,
     },
     {
       key: '4',

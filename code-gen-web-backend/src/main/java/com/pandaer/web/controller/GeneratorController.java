@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pandaer.maker.meta.Meta;
+import com.pandaer.maker.meta.MetaValidator;
 import com.pandaer.web.annotation.AuthCheck;
 import com.pandaer.web.common.BaseResponse;
 import com.pandaer.web.common.DeleteRequest;
@@ -263,6 +265,26 @@ public class GeneratorController {
 
 
     /**
+     * 在线制作代码生成器
+     * @param makingGeneratorRequest 制作代码生成器需要使用的参数
+     * @param response 响应体
+     */
+    @PostMapping("/make")
+    public void makeGeneratorOnline(@RequestBody MakingGeneratorRequest makingGeneratorRequest, HttpServletResponse response) {
+
+        // 校验Meta元信息配置
+        Meta meta = makingGeneratorRequest.getMeta();
+        MetaValidator.validate(meta);
+
+        String zipTemplateFilesUrl = makingGeneratorRequest.getZipTemplateFilesUrl();
+        // TODO 校验 url是否存在
+
+        generatorService.makeGenerator(makingGeneratorRequest,response);
+    }
+
+
+
+    /**
      * 编辑（用户）
      *
      * @param generatorEditRequest
@@ -274,14 +296,10 @@ public class GeneratorController {
         if (generatorEditRequest == null || generatorEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Generator generator = new Generator();
-        BeanUtils.copyProperties(generatorEditRequest, generator);
-        List<String> tags = generatorEditRequest.getTags();
-        if (tags != null) {
-            generator.setTags(JSONUtil.toJsonStr(tags));
-        }
+        Generator generator = generatorEditRequest.toGenerator();
         // 参数校验
         generatorService.validGenerator(generator, false);
+
         User loginUser = userService.getLoginUser(request);
         long id = generatorEditRequest.getId();
         // 判断是否存在

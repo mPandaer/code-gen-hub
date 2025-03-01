@@ -16,21 +16,17 @@ public abstract class MakerTemplate {
         // 获取代码生成器的元信息
         Meta meta = MetaManager.getMetaObject();
         System.out.println("元信息：" + meta);
+        make(meta);
+    }
 
+    public void make(Meta meta) throws IOException, InterruptedException {
         String madeGeneratorDir = generateFile(meta);
-        System.out.println("01 代码文件生成完毕！");
-
         // 构建Jar包
         buildJar(madeGeneratorDir);
-        System.out.println("02 Jar包构建完毕！");
-
         // 生成命令行脚本文件
         String jarPath = generateScriptFiles(meta, madeGeneratorDir);
-        System.out.println("03 创建命令行脚本文件完毕！");
-
         // 生成产物包
         generateDistPackage(madeGeneratorDir, meta, jarPath);
-        System.out.println("04 生成产物包完毕！");
     }
 
     protected abstract String generateDistPackage(String madeGeneratorDir, Meta meta, String jarPath);
