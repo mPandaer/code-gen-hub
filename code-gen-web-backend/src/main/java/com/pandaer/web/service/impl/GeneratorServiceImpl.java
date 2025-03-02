@@ -260,10 +260,10 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         if (userId != null && userId > 0) {
             user = userService.getById(userId);
         }
-        UserVO userVO = userService.getUserVO(user);
-        generatorVO.setUser(userVO);
-        // 2. 已登录，获取用户点赞、收藏状态
-        User loginUser = userService.getLoginUserPermitNull(request);
+
+        if (user != null) {
+            generatorVO.setUser(user.mapToUserVO());
+        }
         return generatorVO;
     }
 
@@ -277,14 +277,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         // 1. 关联查询用户信息
         Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
-        // 2. 已登录，获取用户点赞、收藏状态
-        Map<Long, Boolean> generatorIdHasThumbMap = new HashMap<>();
-        Map<Long, Boolean> generatorIdHasFavourMap = new HashMap<>();
-        User loginUser = userService.getLoginUserPermitNull(request);
-        if (loginUser != null) {
-            Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
-            loginUser = userService.getLoginUser(request);
-        }
+
         // 填充信息
         List<GeneratorVO> generatorVOList = generatorList.stream().map(generator -> {
             GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
@@ -293,7 +286,10 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
-            generatorVO.setUser(userService.getUserVO(user));
+            if (user != null) {
+                generatorVO.setUser(user.mapToUserVO());
+            }
+
             return generatorVO;
         }).collect(Collectors.toList());
         generatorVOPage.setRecords(generatorVOList);

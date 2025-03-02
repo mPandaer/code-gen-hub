@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.pandaer.web.model.enums.UserRoleEnum;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
 import lombok.Data;
@@ -87,5 +88,9 @@ public class User implements Serializable {
 
     public LoginUserVO mapToLoginUserVO() {
         return BeanUtil.toBean(this, LoginUserVO.class);
+    }
+
+    public boolean isAdmin() {
+        return UserRoleEnum.ADMIN.getValue().equals(userRole);
     }
 }

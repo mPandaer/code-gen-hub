@@ -21,6 +21,7 @@ import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -238,7 +239,7 @@ public class UserController {
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
         BaseResponse<User> response = getUserById(id, request);
         User user = response.getData();
-        return ResultUtils.success(userService.getUserVO(user));
+        return ResultUtils.success(user.mapToUserVO());
     }
 
     /**
@@ -279,7 +280,7 @@ public class UserController {
         Page<User> userPage = userService.page(new Page<>(current, size),
                 userService.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
-        List<UserVO> userVO = userService.getUserVO(userPage.getRecords());
+        List<UserVO> userVO = userPage.getRecords().stream().map(User::mapToUserVO).collect(Collectors.toList());
         userVOPage.setRecords(userVO);
         return ResultUtils.success(userVOPage);
     }

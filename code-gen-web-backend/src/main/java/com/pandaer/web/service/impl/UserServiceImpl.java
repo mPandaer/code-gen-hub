@@ -145,105 +145,94 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     /**
-     * 获取当前登录用户（允许未登录）
+     * 判断当前用户是否为管理员。
      *
-     * @param request
-     * @return
-     */
-    @Override
-    public User getLoginUserPermitNull(HttpServletRequest request) {
-        // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null || currentUser.getId() == null) {
-            return null;
-        }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
-        return this.getById(userId);
-    }
-
-    /**
-     * 是否为管理员
-     *
-     * @param request
-     * @return
+     * @param request HTTP请求对象，用于获取当前会话中的用户信息。
+     *                通过该对象的会话属性可以访问用户的登录状态。
+     * @return 返回一个布尔值，表示当前用户是否为管理员。
+     *         如果用户存在且为管理员，则返回true；否则返回false。
      */
     @Override
     public boolean isAdmin(HttpServletRequest request) {
-        // 仅管理员可查询
+        // 从会话中获取用户登录状态对象
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+
+        // 将获取的对象转换为User类型
         User user = (User) userObj;
-        return isAdmin(user);
+
+        // 检查用户对象是否为空，并判断用户是否为管理员
+        return user != null && user.isAdmin();
     }
 
-    @Override
-    public boolean isAdmin(User user) {
-        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
-    }
+
 
     /**
-     * 用户注销
+     * 用户注销函数。
      *
-     * @param request
+     * 该函数用于处理用户注销操作，移除用户的登录状态。如果用户未登录，则抛出业务异常。
+     *
+     * @param request HttpServletRequest对象，包含当前会话信息。
+     *                通过该参数获取用户的会话并检查登录状态。
+     * @return boolean 返回true表示注销成功。
+     * @throws BusinessException 如果用户未登录，抛出业务异常，错误码为ErrorCode.OPERATION_ERROR。
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
+        // 检查用户是否已登录，若未登录则抛出异常
         if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
-        // 移除登录态
+
+        // 移除用户的登录状态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return true;
     }
 
-    @Override
-    public LoginUserVO getLoginUserVO(User user) {
-        if (user == null) {
-            return null;
-        }
-        LoginUserVO loginUserVO = new LoginUserVO();
-        BeanUtils.copyProperties(user, loginUserVO);
-        return loginUserVO;
-    }
 
-    @Override
-    public UserVO getUserVO(User user) {
-        if (user == null) {
-            return null;
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return userVO;
-    }
 
-    @Override
-    public List<UserVO> getUserVO(List<User> userList) {
-        if (CollUtil.isEmpty(userList)) {
-            return new ArrayList<>();
-        }
-        return userList.stream().map(this::getUserVO).collect(Collectors.toList());
-    }
-
+    /**
+     * 根据用户查询请求对象生成查询条件包装器。
+     *
+     * @param userQueryRequest 用户查询请求对象，包含查询条件和排序信息。
+     *                         如果为 null，则抛出参数错误异常。
+     * @return QueryWrapper<User> 查询条件包装器，用于构建数据库查询条件。
+     * @throws BusinessException 如果 userQueryRequest 为 null，则抛出业务异常，提示请求参数为空。
+     */
     @Override
     public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
+        // 检查请求参数是否为空，若为空则抛出业务异常
         if (userQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
+
+        // 从请求对象中提取查询条件
         Long id = userQueryRequest.getId();
         String userName = userQueryRequest.getUserName();
         String userProfile = userQueryRequest.getUserProfile();
         String userRole = userQueryRequest.getUserRole();
         String sortField = userQueryRequest.getSortField();
         String sortOrder = userQueryRequest.getSortOrder();
+
+        // 创建查询条件包装器
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+
+        // 添加 ID 等值查询条件（仅当 ID 不为空时）
         queryWrapper.eq(id != null, "id", id);
 
+        // 添加用户角色等值查询条件（仅当用户角色不为空时）
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
+
+        // 添加用户简介模糊查询条件（仅当用户简介不为空时）
         queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
+
+        // 添加用户名模糊查询条件（仅当用户名不为空时）
         queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
+
+        // 添加排序条件（仅当排序字段有效时）
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
+
+        // 返回构建完成的查询条件包装器
         return queryWrapper;
     }
 }
