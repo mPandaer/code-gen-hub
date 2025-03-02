@@ -68,14 +68,17 @@ public class UserController {
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return null;
+
+        // 校验注册请求参数
+        ValidatedResult validate = userRegisterRequest.validate();
+        if (!validate.isSuccess()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, validate.getMessage());
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
-        return ResultUtils.success(result);
+
+
+        long newUserId = userService.userRegister(userRegisterRequest.getUserAccount(),
+                userRegisterRequest.getUserPassword(), userRegisterRequest.getCheckPassword());
+        return ResultUtils.success(newUserId);
     }
 
     /**

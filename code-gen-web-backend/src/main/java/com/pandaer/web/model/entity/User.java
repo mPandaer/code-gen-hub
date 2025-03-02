@@ -1,5 +1,6 @@
 package com.pandaer.web.model.entity;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,7 +8,11 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.pandaer.web.model.vo.LoginUserVO;
+import com.pandaer.web.model.vo.UserVO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 用户
@@ -74,4 +79,13 @@ public class User implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+
+    public UserVO mapToUserVO() {
+        return BeanUtil.toBean(this, UserVO.class);
+    }
+
+    public LoginUserVO mapToLoginUserVO() {
+        return BeanUtil.toBean(this, LoginUserVO.class);
+    }
 }

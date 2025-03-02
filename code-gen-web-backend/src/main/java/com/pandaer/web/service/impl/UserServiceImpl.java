@@ -42,63 +42,77 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     public static final String SALT = "yupi";
 
+    /**
+     * 用户注册函数，用于处理用户注册请求。
+     * 该函数在并发条件下确保账户的唯一性，并对用户密码进行加密处理，最后将用户信息持久化到数据库。
+     *
+     * @param userAccount 用户账户名，用于唯一标识用户
+     * @param userPassword 用户密码，用于登录验证
+     * @param checkPassword 确认密码，用于验证用户输入的密码是否一致
+     * @return 返回注册用户的唯一标识ID
+     * @throws BusinessException 如果账户重复或数据库操作失败，抛出业务异常
+     */
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
-        // 1. 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
-        }
-        if (userAccount.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
-        }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
-        }
-        // 密码和校验密码相同
-        if (!userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
-        }
+        // 使用synchronized关键字确保在并发条件下，账户的唯一性
         synchronized (userAccount.intern()) {
-            // 账户不能重复
-            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("userAccount", userAccount);
-            long count = this.baseMapper.selectCount(queryWrapper);
+            // 查询数据库中是否已存在相同的账户名
+            Long count = lambdaQuery().eq(User::getUserAccount, userAccount).count();
             if (count > 0) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
             }
-            // 2. 加密
+
+            // 对用户密码进行加密处理，使用MD5算法并添加盐值
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-            // 3. 插入数据
+
+            // 创建用户对象并设置账户名和加密后的密码
             User user = new User();
             user.setUserAccount(userAccount);
             user.setUserPassword(encryptPassword);
-            boolean saveResult = this.save(user);
+
+            // 将用户信息持久化到数据库
+            boolean saveResult = save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
             }
+
+            // 返回注册用户的唯一标识ID
             return user.getId();
         }
     }
 
+
+
+
+    /**
+     * 用户登录认证处理
+     *
+     * @param userAccount 用户账号
+     * @param userPassword 用户明文密码
+     * @param request HTTP请求对象，用于维护登录态
+     * @return 脱敏后的登录用户视图对象
+     * @throws BusinessException 当用户认证失败时抛出，携带错误码 PARAMS_ERROR
+     */
     @Override
     public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
-        // 密码加密
+        // 执行带盐值的MD5加密处理（盐值拼接在密码前）
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
 
-        // 查询用户是否存在
+        // 构建组合查询条件：账号匹配 + 加密密码匹配
         LambdaQueryChainWrapper<User> query =
                 lambdaQuery().eq(User::getUserAccount, userAccount).eq(User::getUserPassword, encryptPassword);
 
         User user = query.one();
-        // 用户不存在
+        // 用户认证失败处理
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        // 3. 记录用户的登录态
+        // 在会话中设置用户登录状态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return this.getLoginUserVO(user);
+        return user.mapToLoginUserVO();
     }
+
 
     /**
      * 获取当前登录用户
