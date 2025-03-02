@@ -59,70 +59,100 @@ public class UserController {
     // region 登录相关
 
     /**
-     * 用户注册
+     * 用户注册接口。
      *
-     * @param userRegisterRequest
-     * @return
+     * 该方法用于处理用户注册请求，接收用户提交的注册信息并进行校验，
+     * 校验通过后调用服务层完成用户注册逻辑，并返回新用户的唯一标识。
+     *
+     * @param userRegisterRequest 用户注册请求对象，包含用户账户、密码及确认密码等信息。
+     *                            不能为空，且需通过内部校验逻辑。
+     * @return BaseResponse<Long> 返回一个包含新用户ID的成功响应对象。
+     *                             如果注册失败，则会抛出业务异常。
      */
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        // 检查请求对象是否为空，为空则抛出参数错误异常
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
-        // 校验注册请求参数
+        // 调用请求对象的校验方法，验证用户输入的合法性
         ValidatedResult validate = userRegisterRequest.validate();
         if (!validate.isSuccess()) {
+            // 如果校验失败，抛出参数错误异常，并附带校验失败的具体信息
             throw new BusinessException(ErrorCode.PARAMS_ERROR, validate.getMessage());
         }
 
-
+        // 调用用户服务层完成注册逻辑，传入用户账户、密码及确认密码
         long newUserId = userService.userRegister(userRegisterRequest.getUserAccount(),
                 userRegisterRequest.getUserPassword(), userRegisterRequest.getCheckPassword());
+
+        // 返回包含新用户ID的成功响应
         return ResultUtils.success(newUserId);
     }
 
+
     /**
-     * 用户登录
+     * 用户登录接口。
      *
-     * @param userLoginRequest
-     * @param request
-     * @return
+     * 该方法用于处理用户登录请求，验证用户输入的账号和密码，并返回登录结果。
+     *
+     * @param userLoginRequest 包含用户登录信息的请求对象，包括用户账号和密码。
+     *                         不能为空，且需要通过内部校验逻辑。
+     * @param request          HTTP请求对象，用于获取与当前请求相关的上下文信息。
+     * @return BaseResponse<LoginUserVO> 返回一个包含登录用户信息的响应对象。
+     *         如果登录成功，返回的响应对象中会包含用户的相关信息；
+     *         如果登录失败，则会抛出业务异常。
      */
     @PostMapping("/login")
     public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        // 检查请求参数是否为空，为空则抛出参数错误异常
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
-        // 校验请求参数
+        // 校验请求参数的合法性，如果校验失败则抛出参数错误异常，并附带校验失败的具体信息
         ValidatedResult validatedResult = userLoginRequest.validate();
         if (!validatedResult.isSuccess()) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, validatedResult.getMessage());
         }
 
+        // 提取用户账号和密码
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
 
+        // 调用用户服务进行登录操作，并返回登录结果
         LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVO);
     }
 
 
+
     /**
-     * 用户注销
+     * 用户注销接口。
      *
-     * @param request
-     * @return
+     * 该方法用于处理用户注销请求，接收一个 HttpServletRequest 对象作为参数，
+     * 调用 userService 的 userLogout 方法执行注销逻辑，并返回操作结果。
+     *
+     * @param request HttpServletRequest 对象，包含用户请求的相关信息。
+     *                如果为 null，则抛出参数错误的业务异常。
+     * @return BaseResponse<Boolean> 返回一个封装了布尔值的响应对象，
+     *         表示注销操作是否成功。成功时返回 true，否则返回 false。
      */
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        // 检查请求对象是否为空，为空则抛出参数错误的业务异常
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+
+        // 调用用户服务层的注销方法，执行具体的注销逻辑
         boolean result = userService.userLogout(request);
+
+        // 将注销结果封装为成功的响应对象并返回
         return ResultUtils.success(result);
     }
+
 
     /**
      * 获取当前登录用户信息。
