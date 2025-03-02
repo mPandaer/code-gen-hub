@@ -124,16 +124,24 @@ public class UserController {
     }
 
     /**
-     * 获取当前登录用户
+     * 获取当前登录用户信息。
      *
-     * @param request
-     * @return
+     * 该方法通过解析请求对象中的用户信息，获取当前登录用户的详细数据，并将其转换为视图对象（VO）返回。
+     *
+     * @param request HttpServletRequest对象，包含当前请求的上下文信息，
+     *                用于从请求中提取登录用户的相关信息。
+     * @return BaseResponse<LoginUserVO> 返回一个封装了登录用户视图对象（LoginUserVO）的响应对象。
+     *         如果用户已登录，返回成功的响应；否则，返回相应的错误信息。
      */
     @GetMapping("/get/login")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        // 从请求中获取当前登录用户的信息
         User user = userService.getLoginUser(request);
-        return ResultUtils.success(userService.getLoginUserVO(user));
+
+        // 将用户实体对象映射为登录用户视图对象，并封装为成功响应返回
+        return ResultUtils.success(user.mapToLoginUserVO());
     }
+
 
     // endregion
 

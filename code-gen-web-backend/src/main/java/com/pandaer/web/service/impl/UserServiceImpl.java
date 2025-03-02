@@ -115,27 +115,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     /**
-     * 获取当前登录用户
+     * 获取当前登录用户信息。
      *
-     * @param request
-     * @return
+     * 该方法通过从请求的会话中获取用户登录状态，验证用户是否已登录，并从数据库中加载最新的用户信息。
+     * 如果用户未登录或用户信息无效，则抛出业务异常。
+     *
+     * @param request HttpServletRequest对象，用于获取当前会话中的用户登录状态。
+     * @return 返回当前登录用户的User对象，包含最新的用户信息。
+     * @throws BusinessException 如果用户未登录或用户信息无效，则抛出业务异常，错误码为ErrorCode.NOT_LOGIN_ERROR。
      */
     @Override
     public User getLoginUser(HttpServletRequest request) {
-        // 先判断是否已登录
+        // 从会话中获取用户登录状态，判断用户是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        // 从数据库查询（追求性能的话可以注释，直接走缓存）
+
+        // 从数据库中查询用户信息（如果追求性能，可以注释此段逻辑，直接使用缓存中的用户信息）
         long userId = currentUser.getId();
         currentUser = this.getById(userId);
         if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
+
         return currentUser;
     }
+
 
     /**
      * 获取当前登录用户（允许未登录）
