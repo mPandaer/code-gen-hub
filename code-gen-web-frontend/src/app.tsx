@@ -7,6 +7,7 @@ import { AvatarDropdown } from './components/RightContent/AvatarDropdown';
 import { requestConfig } from './requestConfig';
 import logo from "@/assets/logo.jpg"
 const loginPath = '/user/login';
+const whiteList = [loginPath, '/user/password/email', '/user/password/reset','/user/register'];
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -17,7 +18,7 @@ export async function getInitialState(): Promise<InitialState> {
   };
   // 如果不是登录页面，执行
   const { location } = history;
-  if (location.pathname !== loginPath) {
+  if (!whiteList.includes(location.pathname)) {
     try {
       const res = await getLoginUserUsingGet();
       initialState.currentUser = res.data;

@@ -2,7 +2,9 @@ package com.pandaer.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pandaer.web.model.dto.user.ChangePasswordRequest;
 import com.pandaer.web.model.dto.user.UserQueryRequest;
+import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
@@ -73,5 +75,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+    void changePassword(ChangePasswordRequest changePasswordRequest, HttpServletRequest request);
+
+    void sendResetPasswordEmail(String email);
+
+    void resetPassword(ResetPasswordRequest resetPasswordRequest);
 
 }

@@ -125,7 +125,8 @@ const Login: React.FC = () => {
               textAlign: 'right',
             }}
           >
-            <Link to="/user/register">新用户注册</Link>
+            <Link to="/user/register" style={{ marginRight: 16 }}>新用户注册</Link>
+            <Link to="/user/password/email">找回密码</Link>
           </div>
         </LoginForm>
       </div>

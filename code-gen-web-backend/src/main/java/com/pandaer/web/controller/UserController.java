@@ -9,12 +9,8 @@ import com.pandaer.web.common.ResultUtils;
 import com.pandaer.web.constant.UserConstant;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
-import com.pandaer.web.model.dto.user.UserAddRequest;
-import com.pandaer.web.model.dto.user.UserLoginRequest;
-import com.pandaer.web.model.dto.user.UserQueryRequest;
-import com.pandaer.web.model.dto.user.UserRegisterRequest;
-import com.pandaer.web.model.dto.user.UserUpdateMyRequest;
-import com.pandaer.web.model.dto.user.UserUpdateRequest;
+import com.pandaer.web.model.dto.user.*;
+import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
@@ -34,12 +30,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.pandaer.web.service.impl.UserServiceImpl.SALT;
 
@@ -172,6 +163,78 @@ public class UserController {
         // 将用户实体对象映射为登录用户视图对象，并封装为成功响应返回
         return ResultUtils.success(user.mapToLoginUserVO());
     }
+
+
+    @PutMapping("/password")
+    public BaseResponse<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, HttpServletRequest request) {
+        // todo
+        // 校验参数
+        if (changePasswordRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        ValidatedResult validatedResult = changePasswordRequest.validate();
+        if (!validatedResult.isSuccess()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, validatedResult.getMessage());
+        }
+
+
+        // 执行修改
+        userService.changePassword(changePasswordRequest,request);
+
+        // 返回结果
+        return ResultUtils.success(null);
+    }
+
+    @GetMapping("/password/reset")
+    public BaseResponse<?> findPassword(String email) {
+        // 校验邮箱
+        if (StringUtils.isBlank(email)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 定义邮箱格式的正则表达式
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if (!email.matches(emailRegex)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邮箱格式不正确");
+        }
+
+
+        // 发送重置密码的邮箱消息
+        userService.sendResetPasswordEmail(email);
+
+
+        // 返回结果
+        return ResultUtils.success(null);
+
+    }
+
+
+
+
+
+    @PostMapping("/password/reset")
+    public BaseResponse<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        // 校验请求参数
+        if (resetPasswordRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        ValidatedResult validatedResult = resetPasswordRequest.validate();
+
+        if (!validatedResult.isSuccess()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, validatedResult.getMessage());
+        }
+
+        // 重置密码
+        userService.resetPassword(resetPasswordRequest);
+
+        // 返回结果
+        return ResultUtils.success(null);
+    }
+
+
+
+
 
 
     // endregion

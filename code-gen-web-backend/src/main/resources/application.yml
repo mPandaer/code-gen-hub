@@ -105,3 +105,10 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.pandaer.web.controller
+
+app:
+  baseUrl: http://localhost:8000
+
+
+
+

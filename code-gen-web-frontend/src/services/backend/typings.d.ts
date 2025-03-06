@@ -1,4 +1,11 @@
 declare namespace API {
+  type AddGeneratorCommentRequest = {
+    content?: string;
+    generatorId?: number;
+    parentId?: number;
+    userId?: number;
+  };
+
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
@@ -23,9 +30,27 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseMapStringObject_ = {
+    code?: number;
+    data?: Record<string, any>;
+    message?: string;
+  };
+
+  type BaseResponseObject_ = {
+    code?: number;
+    data?: Record<string, any>;
+    message?: string;
+  };
+
   type BaseResponsePageGenerator_ = {
     code?: number;
     data?: PageGenerator_;
+    message?: string;
+  };
+
+  type BaseResponsePageGeneratorCommentVO_ = {
+    code?: number;
+    data?: PageGeneratorCommentVO_;
     message?: string;
   };
 
@@ -65,6 +90,16 @@ declare namespace API {
     message?: string;
   };
 
+  type ChangePasswordRequest = {
+    newPassword?: string;
+    oldPassword?: string;
+  };
+
+  type deleteCommentUsingDELETEParams = {
+    /** id */
+    id: number;
+  };
+
   type DeleteRequest = {
     id?: number;
   };
@@ -91,6 +126,11 @@ declare namespace API {
     inputPath?: string;
     outputPath?: string;
     type?: string;
+  };
+
+  type findPasswordUsingGETParams = {
+    /** email */
+    email?: string;
   };
 
   type Generator = {
@@ -125,6 +165,18 @@ declare namespace API {
     tags?: string[];
     userId?: number;
     version?: string;
+  };
+
+  type GeneratorCommentVO = {
+    content?: string;
+    createTime?: string;
+    generatorId?: number;
+    id?: number;
+    likeCount?: number;
+    parentId?: number;
+    status?: number;
+    updateTime?: string;
+    userVO?: UserVO;
   };
 
   type GeneratorEditRequest = {
@@ -192,9 +244,28 @@ declare namespace API {
     version?: string;
   };
 
+  type getDownloadTrendUsingGETParams = {
+    /** end */
+    end?: string;
+    /** start */
+    start?: string;
+  };
+
+  type getGeneratorRankingUsingGETParams = {
+    /** count */
+    count?: number;
+  };
+
   type getGeneratorVOByIdUsingGETParams = {
     /** id */
     id?: number;
+  };
+
+  type getNewUserTrendUsingGETParams = {
+    /** end */
+    end?: string;
+    /** start */
+    start?: string;
   };
 
   type getUserByIdUsingGETParams = {
@@ -268,6 +339,19 @@ declare namespace API {
     total?: number;
   };
 
+  type PageGeneratorCommentVO_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: GeneratorCommentVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
   type PageGeneratorVO_ = {
     countId?: string;
     current?: number;
@@ -279,6 +363,12 @@ declare namespace API {
     searchCount?: boolean;
     size?: number;
     total?: number;
+  };
+
+  type pageListCommentsUsingGETParams = {
+    generatorId?: number;
+    pageNum?: number;
+    pageSize?: number;
   };
 
   type PageUser_ = {
@@ -307,6 +397,18 @@ declare namespace API {
     total?: number;
   };
 
+  type ReplyGeneratorCommentRequest = {
+    content?: string;
+    generatorId?: number;
+    parentId?: number;
+    userId?: number;
+  };
+
+  type ResetPasswordRequest = {
+    newPassword?: string;
+    token?: string;
+  };
+
   type uploadFileUsingPOSTParams = {
     biz?: string;
   };
@@ -317,12 +419,14 @@ declare namespace API {
   };
 
   type User = {
+    admin?: boolean;
     createTime?: string;
     id?: number;
     isDelete?: number;
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
+    userEmail?: string;
     userName?: string;
     userPassword?: string;
     userProfile?: string;

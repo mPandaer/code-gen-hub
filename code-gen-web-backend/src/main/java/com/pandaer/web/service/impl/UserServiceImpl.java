@@ -5,27 +5,39 @@ import static com.pandaer.web.constant.UserConstant.USER_LOGIN_STATE;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.constant.CommonConstant;
 import com.pandaer.web.exception.BusinessException;
+import com.pandaer.web.mapper.PasswordResetTokenMapper;
 import com.pandaer.web.mapper.UserMapper;
+import com.pandaer.web.model.dto.user.ChangePasswordRequest;
 import com.pandaer.web.model.dto.user.UserQueryRequest;
+import com.pandaer.web.model.entity.PasswordResetToken;
+import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.enums.UserRoleEnum;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.UserService;
 import com.pandaer.web.utils.SqlUtils;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -36,6 +48,15 @@ import org.springframework.util.DigestUtils;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    @Autowired
+    private PasswordResetTokenMapper passwordResetTokenMapper;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${app.baseUrl}")
+    private String baseUrl;
 
     /**
      * 盐值，混淆密码
@@ -235,4 +256,132 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 返回构建完成的查询条件包装器
         return queryWrapper;
     }
+
+    /**
+     * 修改用户密码
+     *
+     * @param changePasswordRequest 包含旧密码和新密码的请求对象
+     * @param request HTTP请求对象，用于获取当前登录用户信息
+     * @throws BusinessException 当用户未登录、旧密码错误或密码更新失败时抛出
+     */
+    @Override
+    public void changePassword(ChangePasswordRequest changePasswordRequest, HttpServletRequest request) {
+        // 获取登录用户
+        User loginUser = getLoginUser(request);
+        if (loginUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+
+        // 验证旧密码
+        String currentLoginPassword = loginUser.getUserPassword();
+        String oldPassword = changePasswordRequest.getOldPassword();
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + oldPassword).getBytes());
+
+        if (!currentLoginPassword.equals(encryptPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "旧密码错误");
+        }
+
+        // 更新密码
+        String encryptNewPassword = DigestUtils.md5DigestAsHex((SALT + changePasswordRequest.getNewPassword()).getBytes());
+        boolean updateResult = lambdaUpdate().eq(User::getId, loginUser.getId()).set(User::getUserPassword, encryptNewPassword).update();
+        if (!updateResult) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新密码失败");
+        }
+
+        // 重置登录态
+        userLogout(request);
+    }
+
+
+
+    /**
+     * 发送密码重置邮件。
+     *
+     * 该方法根据提供的邮箱地址查询用户信息，生成密码重置Token并保存到数据库中，
+     * 然后构造密码重置链接并通过邮件发送给用户。
+     *
+     * @param email 用户的邮箱地址，用于查询用户信息和发送重置邮件。
+     *              如果邮箱未绑定任何用户，则抛出异常。
+     * @throws BusinessException 如果未找到与邮箱绑定的用户，抛出业务异常。
+     */
+    @Override
+    public void sendResetPasswordEmail(String email) {
+        // 根据邮箱查询用户信息
+        User resetUser = lambdaQuery().eq(User::getUserEmail, email).one();
+
+        if (resetUser == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "没有该邮箱绑定的用户");
+        }
+
+        // 生成密码重置Token
+        PasswordResetToken passwordResetToken = PasswordResetToken.create(resetUser);
+
+        // 将生成的Token保存到数据库中
+        passwordResetTokenMapper.insert(passwordResetToken);
+
+        // 构造密码重置链接
+        String resetUrl = baseUrl + "/user/password/reset?token=" + passwordResetToken.getToken();
+
+        // 构造邮件内容，包含用户姓名、重置链接及提示信息
+        String message = "您好，" + resetUser.getUserName() + "：\n\n"
+                + "您正在尝试重置您的账户密码。请点击以下链接完成密码重置：\n"
+                + resetUrl + "\n\n"
+                + "如果您并未请求重置密码，请忽略此邮件。\n"
+                + "此链接将在一定时间后失效，请尽快完成操作。\n\n"
+                + "感谢您的使用！\n"
+                + "—— 系统管理员";
+
+        // 调用邮件服务发送密码重置邮件
+        emailService.send(email, "密码重置邮件", message);
+    }
+
+
+
+
+
+
+    /**
+     * 重置用户密码的方法。
+     *
+     * @param resetPasswordRequest 包含重置密码所需信息的请求对象，包括：
+     *                             - token: 用于验证用户身份的令牌
+     *                             - newPassword: 用户设置的新密码
+     * @throws BusinessException 如果令牌无效、已过期或密码更新失败，则抛出业务异常。
+     *                           异常信息包括错误码和描述信息。
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        // 获取并验证重置密码令牌是否存在且未被使用
+        String reqToken = resetPasswordRequest.getToken();
+        PasswordResetToken passwordResetToken = new LambdaQueryChainWrapper<>(passwordResetTokenMapper)
+                .eq(PasswordResetToken::getToken, reqToken).eq(PasswordResetToken::getUsed,0).one();
+
+        if (passwordResetToken == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "重置密码令牌无效");
+        }
+
+        // 验证令牌是否已过期
+        LocalDateTime expireTime = passwordResetToken.getExpireTime();
+        boolean isBefore = LocalDateTime.now().isBefore(expireTime);
+        if (!isBefore) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "重置密码令牌已过期");
+        }
+
+        // 更新用户的密码为新密码，并进行加密处理
+        Long userId = passwordResetToken.getUserId();
+        String cryptoNewPassword = DigestUtils.md5DigestAsHex((SALT + resetPasswordRequest.getNewPassword()).getBytes());
+        boolean updateResult = lambdaUpdate().eq(User::getId, userId).set(User::getUserPassword,
+                cryptoNewPassword).update();
+        if (!updateResult) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "重置密码失败");
+        }
+
+        // 将当前令牌标记为已使用，确保其无法再次使用
+        new LambdaUpdateChainWrapper<>(passwordResetTokenMapper)
+                .eq(PasswordResetToken::getId, passwordResetToken.getId())
+                .set(PasswordResetToken::getUsed, 1)
+                .update();
+    }
+
 }

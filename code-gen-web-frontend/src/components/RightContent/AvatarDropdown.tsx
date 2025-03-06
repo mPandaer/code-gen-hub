@@ -46,7 +46,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         loginOut();
         return;
       }
-      history.push(`/account/${key}`);
+      // 检查 key 是否已经是完整路径（以 '/' 开头）
+      if (key.startsWith('/')) {
+        history.push(key);
+      } else {
+        history.push(`/account/${key}`);
+      }
     },
     [setInitialState],
   );
@@ -85,6 +90,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',
+    },
+    {
+      key: '/user/profile',
+      icon: <UserOutlined />,
+      label: '用户中心',
     },
   ];
 

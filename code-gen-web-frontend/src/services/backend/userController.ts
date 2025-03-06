@@ -120,6 +120,51 @@ export async function userLogoutUsingPost(options?: { [key: string]: any }) {
   });
 }
 
+/** changePassword PUT /api/user/password */
+export async function changePasswordUsingPut(
+  body: API.ChangePasswordRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseObject_>('/api/user/password', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** findPassword GET /api/user/password/reset */
+export async function findPasswordUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.findPasswordUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseObject_>('/api/user/password/reset', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** resetPassword POST /api/user/password/reset */
+export async function resetPasswordUsingPost(
+  body: API.ResetPasswordRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseObject_>('/api/user/password/reset', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** userRegister POST /api/user/register */
 export async function userRegisterUsingPost(
   body: API.UserRegisterRequest,
