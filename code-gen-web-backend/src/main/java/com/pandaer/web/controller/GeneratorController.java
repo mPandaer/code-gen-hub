@@ -1,10 +1,7 @@
 package com.pandaer.web.controller;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.PathUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pandaer.maker.meta.Meta;
@@ -14,7 +11,6 @@ import com.pandaer.web.common.BaseResponse;
 import com.pandaer.web.common.DeleteRequest;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.common.ResultUtils;
-import com.pandaer.web.constant.FileConstant;
 import com.pandaer.web.constant.UserConstant;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
@@ -27,22 +23,20 @@ import com.pandaer.web.model.vo.GeneratorVO;
 import com.pandaer.web.service.GeneratorService;
 import com.pandaer.web.service.UserGeneratorService;
 import com.pandaer.web.service.UserService;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 帖子接口

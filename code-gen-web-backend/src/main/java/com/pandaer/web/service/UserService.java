@@ -7,10 +7,8 @@ import com.pandaer.web.model.dto.user.UserQueryRequest;
 import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.LoginUserVO;
-import com.pandaer.web.model.vo.UserVO;
-import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
 /**
  * 用户服务

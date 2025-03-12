@@ -1,12 +1,11 @@
 package com.pandaer.web.model.dto.generator;
 
 import com.pandaer.web.common.PageRequest;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 查询请求

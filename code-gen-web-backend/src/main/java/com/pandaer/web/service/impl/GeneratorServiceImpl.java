@@ -1,6 +1,7 @@
 package com.pandaer.web.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
@@ -9,15 +10,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.maker.ZipGeneratorMaker;
+import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.constant.CommonConstant;
 import com.pandaer.web.constant.FileConstant;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
 import com.pandaer.web.manager.CosManager;
-import com.pandaer.web.mapper.GeneratorFeeMapper;
 import com.pandaer.web.mapper.GeneratorMapper;
-import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.dto.generator.GeneratorQueryRequest;
 import com.pandaer.web.model.dto.generator.MakingGeneratorRequest;
 import com.pandaer.web.model.entity.Generator;
@@ -25,32 +25,28 @@ import com.pandaer.web.model.entity.GeneratorFee;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.GeneratorFeeVO;
 import com.pandaer.web.model.vo.GeneratorVO;
-import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.GeneratorFeeService;
 import com.pandaer.web.service.GeneratorService;
 import com.pandaer.web.service.UserService;
 import com.pandaer.web.utils.SqlUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.collection.CollUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 帖子服务实现

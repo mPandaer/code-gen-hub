@@ -1,8 +1,5 @@
 package com.pandaer.web.model.dto.generator;
 
-import java.io.Serializable;
-import java.util.List;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -10,6 +7,9 @@ import cn.hutool.json.JSONUtil;
 import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.entity.Generator;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 编辑请求

@@ -1,7 +1,7 @@
 package com.pandaer.web.service;
 
-import com.pandaer.web.model.entity.UserGenerator;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pandaer.web.model.entity.UserGenerator;
 
 /**
 * @author pandaer

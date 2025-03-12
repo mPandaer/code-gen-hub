@@ -2,6 +2,7 @@ package com.pandaer.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.pandaer.web.model.entity.Generator;
+
 import java.util.Date;
 import java.util.List;
 

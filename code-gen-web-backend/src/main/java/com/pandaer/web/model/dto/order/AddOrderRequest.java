@@ -1,15 +1,12 @@
 package com.pandaer.web.model.dto.order;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.pandaer.web.model.entity.Order;
 import com.pandaer.web.model.enums.OrderStatusEnum;
 import com.pandaer.web.utils.IdUtil;
 import com.pandaer.web.validate.Validatable;
 import com.pandaer.web.validate.ValidatedResult;
 import lombok.Data;
-import org.joda.time.LocalDate;
 
 import java.math.BigDecimal;
 import java.util.Date;

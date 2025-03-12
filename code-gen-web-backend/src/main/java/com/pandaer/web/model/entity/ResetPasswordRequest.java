@@ -11,6 +11,8 @@ public class ResetPasswordRequest implements Validatable {
 
     private String token;
 
+    private String email;
+
     private String newPassword;
 
 

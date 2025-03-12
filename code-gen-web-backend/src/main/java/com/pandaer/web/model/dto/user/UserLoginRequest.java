@@ -1,14 +1,11 @@
 package com.pandaer.web.model.dto.user;
 
-import java.io.Serializable;
-
-import com.pandaer.web.common.ErrorCode;
-import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.validate.Validatable;
 import com.pandaer.web.validate.ValidatedResult;
 import lombok.Data;
-import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
 
 /**
  * 用户登录请求

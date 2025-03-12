@@ -1,9 +1,9 @@
 package com.pandaer.web.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 

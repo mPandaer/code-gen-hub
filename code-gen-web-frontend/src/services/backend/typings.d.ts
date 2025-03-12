@@ -478,6 +478,7 @@ declare namespace API {
   };
 
   type ResetPasswordRequest = {
+    email?: string;
     newPassword?: string;
     token?: string;
   };

@@ -3,14 +3,12 @@ package com.pandaer.web.model.vo;
 import cn.hutool.json.JSONUtil;
 import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.entity.Generator;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import com.pandaer.web.model.entity.GeneratorFee;
-import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 /**
  * 帖子视图

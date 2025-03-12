@@ -1,26 +1,16 @@
 package com.pandaer.web.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.diagnosis.DiagnosisUtils;
-import com.alipay.api.domain.*;
-import com.alipay.api.request.AlipayTradeCancelRequest;
+import com.alipay.api.domain.AlipayTradePagePayModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
-import com.alipay.api.request.AlipayTradePrecreateRequest;
-import com.alipay.api.response.AlipayTradeCancelResponse;
 import com.alipay.api.response.AlipayTradePagePayResponse;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
-import com.pandaer.web.config.PayConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 class OrderServiceImplTest {

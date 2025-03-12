@@ -1,7 +1,7 @@
 package com.pandaer.web.mapper;
 
-import com.pandaer.web.model.entity.GeneratorComment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pandaer.web.model.entity.GeneratorComment;
 
 /**
 * @author pandaer

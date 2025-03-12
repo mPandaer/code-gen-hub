@@ -1,19 +1,14 @@
 package com.pandaer.web.model.entity;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.*;
 import com.pandaer.web.model.enums.UserRoleEnum;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 用户

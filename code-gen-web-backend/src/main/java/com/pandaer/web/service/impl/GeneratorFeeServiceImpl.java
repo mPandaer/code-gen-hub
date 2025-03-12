@@ -1,9 +1,9 @@
 package com.pandaer.web.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pandaer.web.mapper.GeneratorFeeMapper;
 import com.pandaer.web.model.entity.GeneratorFee;
 import com.pandaer.web.service.GeneratorFeeService;
-import com.pandaer.web.mapper.GeneratorFeeMapper;
 import org.springframework.stereotype.Service;
 
 /**

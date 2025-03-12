@@ -1,12 +1,9 @@
 package com.pandaer.web.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.pandaer.web.common.ErrorCode;
-import com.pandaer.web.exception.BusinessException;
+import com.pandaer.web.mapper.UserGeneratorMapper;
 import com.pandaer.web.model.entity.UserGenerator;
 import com.pandaer.web.service.UserGeneratorService;
-import com.pandaer.web.mapper.UserGeneratorMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**

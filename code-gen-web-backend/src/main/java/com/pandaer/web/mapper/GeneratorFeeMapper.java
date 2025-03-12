@@ -1,7 +1,7 @@
 package com.pandaer.web.mapper;
 
-import com.pandaer.web.model.entity.GeneratorFee;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pandaer.web.model.entity.GeneratorFee;
 
 /**
 * @author pandaer

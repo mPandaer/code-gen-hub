@@ -1,14 +1,13 @@
 package com.pandaer.web.service.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pandaer.web.mapper.DownloadLogMapper;
 import com.pandaer.web.mapper.UserMapper;
 import com.pandaer.web.model.entity.DownloadLog;
 import com.pandaer.web.model.vo.DailyDownloadVO;
 import com.pandaer.web.model.vo.DailyRegisterUserVO;
 import com.pandaer.web.model.vo.GeneratorDownloadVO;
 import com.pandaer.web.service.DownloadLogService;
-import com.pandaer.web.mapper.DownloadLogMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,44 +1,34 @@
 package com.pandaer.web.service.impl;
 
-import static com.pandaer.web.constant.UserConstant.USER_LOGIN_STATE;
-
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.constant.CommonConstant;
 import com.pandaer.web.exception.BusinessException;
-import com.pandaer.web.mapper.PasswordResetTokenMapper;
 import com.pandaer.web.mapper.UserMapper;
 import com.pandaer.web.model.dto.user.ChangePasswordRequest;
 import com.pandaer.web.model.dto.user.UserQueryRequest;
 import com.pandaer.web.model.entity.PasswordResetToken;
 import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
-import com.pandaer.web.model.enums.UserRoleEnum;
 import com.pandaer.web.model.vo.LoginUserVO;
-import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.UserService;
 import com.pandaer.web.utils.SqlUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
+
+import static com.pandaer.web.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现
@@ -49,11 +39,12 @@ import org.springframework.util.DigestUtils;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    @Autowired
-    private PasswordResetTokenMapper passwordResetTokenMapper;
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private RedisTemplate<String,String> stringRedisTemplate;
 
     @Value("${app.baseUrl}")
     private String baseUrl;
@@ -317,17 +308,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         PasswordResetToken passwordResetToken = PasswordResetToken.create(resetUser);
 
         // 将生成的Token保存到数据库中
-        passwordResetTokenMapper.insert(passwordResetToken);
+        // TODO 这里应该存入Redis中，而不是数据库中 切记设置过期时间
+        stringRedisTemplate.opsForValue().set(email, JSONUtil.toJsonStr(passwordResetToken), Duration.ofMinutes(15));
+//        passwordResetTokenMapper.insert(passwordResetToken);
 
         // 构造密码重置链接
-        String resetUrl = baseUrl + "/user/password/reset?token=" + passwordResetToken.getToken();
+        String resetUrl = baseUrl + "/user/password/reset?token=" + passwordResetToken.getToken() + "&email=" + email;
 
         // 构造邮件内容，包含用户姓名、重置链接及提示信息
         String message = "您好，" + resetUser.getUserName() + "：\n\n"
                 + "您正在尝试重置您的账户密码。请点击以下链接完成密码重置：\n"
                 + resetUrl + "\n\n"
                 + "如果您并未请求重置密码，请忽略此邮件。\n"
-                + "此链接将在一定时间后失效，请尽快完成操作。\n\n"
+                + "此链接将在15分钟后失效，请尽快完成操作。\n\n"
                 + "感谢您的使用！\n"
                 + "—— 系统管理员";
 
@@ -354,18 +347,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
         // 获取并验证重置密码令牌是否存在且未被使用
         String reqToken = resetPasswordRequest.getToken();
-        PasswordResetToken passwordResetToken = new LambdaQueryChainWrapper<>(passwordResetTokenMapper)
-                .eq(PasswordResetToken::getToken, reqToken).eq(PasswordResetToken::getUsed,0).one();
+
+        // TODO 应该从Redis中获取Token信息
+//        PasswordResetToken passwordResetToken = new LambdaQueryChainWrapper<>(passwordResetTokenMapper)
+//                .eq(PasswordResetToken::getToken, reqToken).eq(PasswordResetToken::getUsed,0).one();
+        String passwordResetTokenStr = stringRedisTemplate.opsForValue().get(resetPasswordRequest.getEmail());
+        PasswordResetToken passwordResetToken = JSONUtil.toBean(passwordResetTokenStr, PasswordResetToken.class);
 
         if (passwordResetToken == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "重置密码令牌无效");
         }
 
+        // TODO 这段逻辑可以删掉了
         // 验证令牌是否已过期
-        LocalDateTime expireTime = passwordResetToken.getExpireTime();
-        boolean isBefore = LocalDateTime.now().isBefore(expireTime);
-        if (!isBefore) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "重置密码令牌已过期");
+//        LocalDateTime expireTime = passwordResetToken.getExpireTime();
+//        boolean isBefore = LocalDateTime.now().isBefore(expireTime);
+//        if (!isBefore) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "重置密码令牌已过期");
+//        }
+
+
+        if (!passwordResetToken.getToken().equals(reqToken)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "重置密码令牌无效");
         }
 
         // 更新用户的密码为新密码，并进行加密处理
@@ -378,10 +381,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 将当前令牌标记为已使用，确保其无法再次使用
-        new LambdaUpdateChainWrapper<>(passwordResetTokenMapper)
-                .eq(PasswordResetToken::getId, passwordResetToken.getId())
-                .set(PasswordResetToken::getUsed, 1)
-                .update();
+        stringRedisTemplate.delete(resetPasswordRequest.getEmail());
     }
 
 }

@@ -1,10 +1,10 @@
 package com.pandaer.web.model.dto.generator;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.pandaer.maker.meta.Meta;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 更新请求

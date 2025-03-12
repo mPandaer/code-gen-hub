@@ -1,20 +1,19 @@
 package com.pandaer.web.manager;
 
+import com.pandaer.web.config.CosConfig;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import com.pandaer.web.config.CosConfig;
-
-import java.io.File;
-import javax.annotation.Resource;
-
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.io.File;
 
 /**
  * Cos 对象存储操作

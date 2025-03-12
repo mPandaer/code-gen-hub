@@ -15,22 +15,17 @@ import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.LoginUserVO;
 import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.UserService;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.pandaer.web.validate.ValidatedResult;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
-import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
-import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.pandaer.web.service.impl.UserServiceImpl.SALT;
 
@@ -185,6 +180,11 @@ public class UserController {
         // 返回结果
         return ResultUtils.success(null);
     }
+
+
+
+
+
 
     @GetMapping("/password/reset")
     public BaseResponse<?> findPassword(String email) {

@@ -68,7 +68,7 @@ public class PasswordResetToken implements Serializable {
         passwordResetToken.setUserId(resetUser.getId());
         passwordResetToken.setToken(token);
         passwordResetToken.setCreateTime(LocalDateTime.now());
-        passwordResetToken.setExpireTime(LocalDateTime.now().plusHours(6));
+        passwordResetToken.setExpireTime(LocalDateTime.now().plusMinutes(15));
 
         return passwordResetToken;
 

@@ -1,7 +1,7 @@
 package com.pandaer.web.mapper;
 
-import com.pandaer.web.model.entity.DownloadLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pandaer.web.model.entity.DownloadLog;
 import com.pandaer.web.model.vo.DailyDownloadVO;
 import com.pandaer.web.model.vo.DailyRegisterUserVO;
 import com.pandaer.web.model.vo.GeneratorDownloadVO;

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.mapper.GeneratorMapper;
+import com.pandaer.web.mapper.OrderMapper;
 import com.pandaer.web.mapper.UserMapper;
 import com.pandaer.web.model.dto.order.AddOrderRequest;
 import com.pandaer.web.model.entity.Generator;
@@ -13,7 +14,6 @@ import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.GeneratorVO;
 import com.pandaer.web.model.vo.OrderVO;
 import com.pandaer.web.service.OrderService;
-import com.pandaer.web.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
