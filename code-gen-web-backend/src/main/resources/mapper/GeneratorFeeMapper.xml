@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pandaer.web.mapper.GeneratorFeeMapper">
+
+    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.GeneratorFee">
+            <id property="generatorId" column="generator_id" />
+            <result property="price" column="price" />
+            <result property="isFree" column="is_free" />
+            <result property="validity" column="validity" />
+            <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        generator_id,price,is_free,validity,create_time
+    </sql>
+</mapper>

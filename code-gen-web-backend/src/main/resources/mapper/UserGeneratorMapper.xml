@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pandaer.web.mapper.UserGeneratorMapper">
+
+    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.UserGenerator">
+            <id property="userId" column="user_id" />
+            <id property="generatorId" column="generator_id" />
+            <result property="purchaseTime" column="purchase_time" />
+            <result property="expireTime" column="expire_time" />
+            <result property="status" column="status" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id,generator_id,purchase_time,expire_time,status
+    </sql>
+</mapper>
