@@ -11,6 +11,7 @@ const ResetPassword: React.FC = () => {
 
   // 从 URL 中获取 token
   const token = new URLSearchParams(location.search).get('token');
+  const email = new URLSearchParams(location.search).get('email');
 
   const onFinish = async (values: { password: string; confirmPassword: string }) => {
     if (!token) {
@@ -26,6 +27,7 @@ const ResetPassword: React.FC = () => {
     try {
       setLoading(true);
       const res = await resetPasswordUsingPost({
+        email,
         token,
         newPassword: values.password,
       })

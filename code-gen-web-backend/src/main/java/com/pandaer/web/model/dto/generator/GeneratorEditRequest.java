@@ -6,6 +6,8 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.json.JSONUtil;
 import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.entity.Generator;
+import com.pandaer.web.model.entity.GeneratorFee;
+import com.pandaer.web.model.vo.GeneratorFeeVO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -68,6 +70,8 @@ public class GeneratorEditRequest implements Serializable {
      * 模型配置（json字符串）
      */
     private Meta.ModelConfig modelConfig;
+
+    private GeneratorFeeVO generatorFee;
 
     /**
      * 代码生成器产物路径

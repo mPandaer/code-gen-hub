@@ -182,6 +182,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
+    generatorFee?: GeneratorFeeVO;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;

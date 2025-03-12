@@ -45,7 +45,24 @@ const AddGeneratorPage: React.FC = () => {
       const resp = await getGeneratorVoByIdUsingGet({ id: Number(id) });
       if (resp.data) {
         const data = resp.data;
-        formRef.current?.setFieldsValue(data);
+        formRef.current?.setFieldsValue({
+          isFree: data.generatorFee?.isFree ?? 1,
+        });
+        
+        formRef.current?.setFieldsValue({
+          picture: data.picture,
+          name: data.name,
+          description: data.description,
+          author: data.author,
+          version: data.version,
+          basePackage: data.basePackage,
+          tags: data.tags,
+          price: data.generatorFee?.price,
+          validity: data.generatorFee?.validity || '永久',
+          fileConfig: data.fileConfig,
+          modelConfig: data.modelConfig,
+          distPath: data.distPath
+        });
         setOriginInfo(data);
       }
     } catch (error) {
@@ -71,13 +88,24 @@ const AddGeneratorPage: React.FC = () => {
             // 创建一个代码生成器
             try {
               if (id) {
-                const resp = await editGeneratorUsingPost({ ...values, id: Number(id) });
+                const resp = await editGeneratorUsingPost({id: Number(id),...values,generatorFee: {
+                  isFree: values.isFree,
+                  price: values.price,
+                  validity: values.validity,
+                } });
                 if (resp.data) {
                   message.success('修改成功');
                   // TODO 跳转到详情页
                 }
               } else {
-                const resp = await addGeneratorUsingPost(values);
+                const resp = await addGeneratorUsingPost({
+                  ...values,
+                  generatorFee: {
+                    isFree: values.isFree,
+                    price: values.price,
+                    validity: values.validity,
+                  },
+                });
                 if (resp.data) {
                   message.success('创建成功');
                   // TODO 跳转到详情页
@@ -109,6 +137,9 @@ const AddGeneratorPage: React.FC = () => {
                   version: values.version,
                   basePackage: values.basePackage,
                   tags: values.tags,
+                  isFree: values.isFree,
+                  price: values.price,
+                  validity: values.validity,
                 },
               }));
               return true;
@@ -145,6 +176,44 @@ const AddGeneratorPage: React.FC = () => {
             />
 
             <ProFormSelect mode="tags" label="标签" name="tags" />
+
+            <ProFormSelect
+              name="isFree"
+              label="是否免费"
+              initialValue={1}
+              options={[
+                { value: 1, label: '免费' },
+                { value: 0, label: '付费' },
+              ]}
+            />
+
+            <ProFormItem
+              noStyle
+              shouldUpdate={(prevValues, currentValues) =>
+                prevValues.isFree !== currentValues.isFree
+              }
+            >
+              {({ getFieldValue }) =>
+                getFieldValue('isFree') === 0 && (
+                  <>
+                    <ProFormText
+                      name="price"
+                      label="价格"
+                      width="md"
+                      placeholder="请输入价格"
+                      rules={[{ required: true, message: '请输入价格' }]}
+                    />
+                    <ProFormText
+                      name="validity"
+                      label="有效期"
+                      width="md"
+                      placeholder="请输入有效期（天）"
+                      rules={[{ required: true, message: '请输入有效期' }]}
+                    />
+                  </>
+                )
+              }
+            </ProFormItem>
           </StepsForm.StepForm>
 
           {/* TODO 第二步 文件信息 */}
@@ -265,6 +334,11 @@ const AddGeneratorPage: React.FC = () => {
                                 ...baseInfo,
                                 fileConfig: fileConfig,
                                 modelConfig: modelConfig,
+                                generatorFee: {
+                                  isFree: baseInfo.isFree,
+                                  price: baseInfo.price,
+                                  validity: baseInfo.validity,
+                                },
                               },
                               zipTemplateFilesUrl: templateFilesUrl,
                             },{ responseType: 'blob' });

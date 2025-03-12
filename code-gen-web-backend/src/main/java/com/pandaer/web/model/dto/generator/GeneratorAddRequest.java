@@ -1,6 +1,8 @@
 package com.pandaer.web.model.dto.generator;
 
 import com.pandaer.maker.meta.Meta;
+import com.pandaer.web.model.entity.GeneratorFee;
+import com.pandaer.web.model.vo.GeneratorFeeVO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -73,6 +75,12 @@ public class GeneratorAddRequest implements Serializable {
      * 创建用户 id
      */
     private Long userId;
+
+    /**
+     * 代码生成器付费信息
+     *
+     */
+    private GeneratorFeeVO generatorFee;
 
 
 }

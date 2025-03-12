@@ -1,5 +1,6 @@
 package com.pandaer.web.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -17,9 +18,12 @@ import com.pandaer.web.exception.ThrowUtils;
 import com.pandaer.web.manager.CosManager;
 import com.pandaer.web.model.dto.generator.*;
 import com.pandaer.web.model.entity.Generator;
+import com.pandaer.web.model.entity.GeneratorFee;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.entity.UserGenerator;
+import com.pandaer.web.model.vo.GeneratorFeeVO;
 import com.pandaer.web.model.vo.GeneratorVO;
+import com.pandaer.web.service.GeneratorFeeService;
 import com.pandaer.web.service.GeneratorService;
 import com.pandaer.web.service.UserGeneratorService;
 import com.pandaer.web.service.UserService;
@@ -57,6 +61,10 @@ public class GeneratorController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private GeneratorFeeService generatorFeeService;
+
     @Autowired
     private CosManager cosManager;
 
@@ -84,6 +92,14 @@ public class GeneratorController {
         User loginUser = userService.getLoginUser(request);
         generator.setUserId(loginUser.getId());
         boolean result = generatorService.save(generator);
+
+
+        // 保存代码生成器付费信息
+        GeneratorFeeVO generatorFeeVO = generatorAddRequest.getGeneratorFee();
+        GeneratorFee generatorFee = BeanUtil.toBean(generatorFeeVO, GeneratorFee.class);
+        generatorFee.setGeneratorId(generator.getId());
+        generatorFeeService.save(generatorFee);
+
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newGeneratorId = generator.getId();
         return ResultUtils.success(newGeneratorId);
@@ -320,6 +336,10 @@ public class GeneratorController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean result = generatorService.updateById(generator);
+        GeneratorFeeVO generatorFeeVO = generatorEditRequest.getGeneratorFee();
+//        GeneratorFee generatorFee = BeanUtil.toBean(generatorFeeVO, GeneratorFee.class);
+        generatorFeeService.lambdaUpdate().eq(GeneratorFee::getGeneratorId,generator.getId()).set(GeneratorFee::getPrice,generatorFeeVO.getPrice()).update();
+
         return ResultUtils.success(result);
     }
 
