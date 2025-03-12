@@ -6,6 +6,12 @@ declare namespace API {
     userId?: number;
   };
 
+  type AddOrderRequest = {
+    amount?: number;
+    generatorId?: number;
+    userId?: number;
+  };
+
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
@@ -42,6 +48,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseOrderVO_ = {
+    code?: number;
+    data?: OrderVO;
+    message?: string;
+  };
+
   type BaseResponsePageGenerator_ = {
     code?: number;
     data?: PageGenerator_;
@@ -72,6 +84,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePayResponse_ = {
+    code?: number;
+    data?: PayResponse;
+    message?: string;
+  };
+
   type BaseResponseString_ = {
     code?: number;
     data?: string;
@@ -81,6 +99,12 @@ declare namespace API {
   type BaseResponseUser_ = {
     code?: number;
     data?: User;
+    message?: string;
+  };
+
+  type BaseResponseUserGenerator_ = {
+    code?: number;
+    data?: UserGenerator;
     message?: string;
   };
 
@@ -193,6 +217,13 @@ declare namespace API {
     version?: string;
   };
 
+  type GeneratorFeeVO = {
+    createTime?: string;
+    isFree?: number;
+    price?: number;
+    validity?: string;
+  };
+
   type GeneratorQueryRequest = {
     author?: string;
     basePackage?: string;
@@ -232,6 +263,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
+    generatorFee?: GeneratorFeeVO;
     id?: number;
     modelConfig?: ModelConfig;
     name?: string;
@@ -251,6 +283,13 @@ declare namespace API {
     start?: string;
   };
 
+  type getGeneratorForUserPurchaseUsingGETParams = {
+    /** generatorId */
+    generatorId?: number;
+    /** userId */
+    userId?: number;
+  };
+
   type getGeneratorRankingUsingGETParams = {
     /** count */
     count?: number;
@@ -268,6 +307,11 @@ declare namespace API {
     start?: string;
   };
 
+  type getOrderByIdUsingGETParams = {
+    /** orderId */
+    orderId: string;
+  };
+
   type getUserByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -276,6 +320,11 @@ declare namespace API {
   type getUserVOByIdUsingGETParams = {
     /** id */
     id?: number;
+  };
+
+  type isFreeByIdUsingGETParams = {
+    /** id */
+    id: number;
   };
 
   type LoginUserVO = {
@@ -324,6 +373,21 @@ declare namespace API {
   type OrderItem = {
     asc?: boolean;
     column?: string;
+  };
+
+  type OrderVO = {
+    amount?: number;
+    createTime?: string;
+    expireTime?: string;
+    generator?: GeneratorVO;
+    orderId?: string;
+    orderStatus?: number;
+    outTradeNo?: string;
+    payTime?: string;
+    paymentMethod?: string;
+    paymentNo?: string;
+    remark?: string;
+    user?: UserVO;
   };
 
   type PageGenerator_ = {
@@ -397,6 +461,15 @@ declare namespace API {
     total?: number;
   };
 
+  type PayRequest = {
+    orderId?: string;
+    subject?: string;
+  };
+
+  type PayResponse = {
+    htmlPage?: string;
+  };
+
   type ReplyGeneratorCommentRequest = {
     content?: string;
     generatorId?: number;
@@ -438,6 +511,14 @@ declare namespace API {
     userAvatar?: string;
     userName?: string;
     userRole?: string;
+  };
+
+  type UserGenerator = {
+    expireTime?: string;
+    generatorId?: number;
+    purchaseTime?: string;
+    status?: number;
+    userId?: number;
   };
 
   type UserLoginRequest = {

@@ -1,7 +1,9 @@
 package com.pandaer.web.service;
 
+import com.pandaer.web.model.dto.order.AddOrderRequest;
 import com.pandaer.web.model.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.pandaer.web.model.vo.OrderVO;
 
 /**
 * @author pandaer
@@ -9,5 +11,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2025-03-12 10:00:41
 */
 public interface OrderService extends IService<Order> {
+
+
+    OrderVO addOrder(AddOrderRequest addOrderRequest);
+
+    OrderVO getOrderById(String orderId);
 
 }

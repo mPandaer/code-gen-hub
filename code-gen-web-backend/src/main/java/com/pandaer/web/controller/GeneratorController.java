@@ -2,6 +2,7 @@ package com.pandaer.web.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
@@ -21,8 +22,10 @@ import com.pandaer.web.manager.CosManager;
 import com.pandaer.web.model.dto.generator.*;
 import com.pandaer.web.model.entity.Generator;
 import com.pandaer.web.model.entity.User;
+import com.pandaer.web.model.entity.UserGenerator;
 import com.pandaer.web.model.vo.GeneratorVO;
 import com.pandaer.web.service.GeneratorService;
+import com.pandaer.web.service.UserGeneratorService;
 import com.pandaer.web.service.UserService;
 
 import java.io.File;
@@ -39,11 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 帖子接口
@@ -57,6 +56,10 @@ public class GeneratorController {
 
     @Resource
     private GeneratorService generatorService;
+
+
+    @Resource
+    private UserGeneratorService userGeneratorService;
 
     @Resource
     private UserService userService;
@@ -283,6 +286,19 @@ public class GeneratorController {
     }
 
 
+    @GetMapping("/users/purchase")
+    public BaseResponse<UserGenerator> getGeneratorForUserPurchase(Long userId,Long generatorId) {
+        if (ObjectUtil.hasNull(userId,generatorId)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserGenerator purchasedGenerator = userGeneratorService.getGeneratorForPurchase(userId, generatorId);
+        return ResultUtils.success(purchasedGenerator);
+    }
+
+
+
+
+
 
     /**
      * 编辑（用户）
@@ -311,6 +327,24 @@ public class GeneratorController {
         }
         boolean result = generatorService.updateById(generator);
         return ResultUtils.success(result);
+    }
+
+
+    @GetMapping("/{id}/free")
+    public BaseResponse<Boolean> isFreeById(@PathVariable("id") Long generatorId) {
+        if (generatorId == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        Generator generator = generatorService.getById(generatorId);
+        if (generator == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        Boolean res = generatorService.isFreeById(generatorId);
+        return ResultUtils.success(res);
+
+
     }
 
 }

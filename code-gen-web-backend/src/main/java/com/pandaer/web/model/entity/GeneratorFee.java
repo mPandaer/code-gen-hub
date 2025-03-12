@@ -43,4 +43,7 @@ public class GeneratorFee {
      */
     @TableField(value = "create_time")
     private Date createTime;
+
+
+
 }

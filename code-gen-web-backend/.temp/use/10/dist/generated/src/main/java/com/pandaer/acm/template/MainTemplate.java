@@ -6,11 +6,12 @@ import java.util.Scanner;
 /**
  * ACM 输入模板 (默认：循环获取值并求和)
  *
- * @author bobonini
+ * @author 090-90909090909090
  */
 public class MainTemplate {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
 
             // 读取输入元素个数
             int n = scanner.nextInt();
@@ -28,7 +29,8 @@ public class MainTemplate {
                 sum += num;
             }
 
-            System.out.println("1534" + sum);
+            System.out.println("hahahahahahah" + sum);
+        }
 
         scanner.close();
     }

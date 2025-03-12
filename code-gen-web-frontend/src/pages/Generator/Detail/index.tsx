@@ -1,5 +1,5 @@
 import { fileDownloadUsingGet } from '@/services/backend/fileController';
-import { getGeneratorVoByIdUsingGet } from '@/services/backend/generatorController';
+import { getGeneratorForUserPurchaseUsingGet, getGeneratorVoByIdUsingGet, isFreeByIdUsingGet } from '@/services/backend/generatorController';
 import { useParams } from '@@/exports';
 import { DownloadOutlined, EditOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
@@ -13,6 +13,7 @@ import {
   Flex,
   Image,
   message,
+  Modal,
   Row,
   Space,
   Tabs, TabsProps,
@@ -21,16 +22,18 @@ import {
 } from 'antd';
 import { saveAs } from 'file-saver';
 import { useEffect, useState } from 'react';
-import { Link } from 'umi';
+import { Link, useNavigate } from 'umi';
 import UserInfoTab from "@/pages/Generator/Detail/components/UserInfo";
 import FileInfoTab from "@/pages/Generator/Detail/components/FileInfo";
 import ModelInfoTab from "@/pages/Generator/Detail/components/ModelInfo";
 import CommentInfoTab from "@/pages/Generator/Detail/components/CommentInfo";
+import { addOrderUsingPost } from '@/services/backend/orderController';
 
 const DetailGeneratorPage: React.FC = () => {
   const { id } = useParams();
   const [generatorInfo, setGeneratorInfo] = useState<API.GeneratorVO>();
   const { initialState, setInitialState } = useModel('@@initialState');
+  const navigate = useNavigate();
 
   const loadGeneratorInfo = async () => {
     try {
@@ -52,6 +55,61 @@ const DetailGeneratorPage: React.FC = () => {
     // 从路径中获取文件名
     const fileName = pathName.split('/').pop() || 'download';
     saveAs(blob, fileName);
+  };
+
+  const handleUseGenerator = async () => {
+    if (!initialState?.currentUser?.id) {
+      message.error('请先登录');
+      return;
+    }
+    
+    try {
+      // 检查用户是否已购买该生成器
+      const res = await getGeneratorForUserPurchaseUsingGet({
+        generatorId: generatorInfo?.id,
+        userId: initialState.currentUser.id
+      });
+      
+      // 如果已购买或免费，直接使用
+      if (res.data || generatorInfo?.generatorFee?.isFree === 1) {
+        // 跳转到使用页面
+        navigate(`/generator/use/${generatorInfo?.id}`);
+      } else {
+        // 显示购买确认弹窗
+        Modal.confirm({
+          title: '购买确认',
+          content: (
+            <div>
+              <p>该代码生成器需要购买才能使用</p>
+              <p>价格: ¥{generatorInfo?.generatorFee?.price || 0}</p>
+              <p>有效期: {generatorInfo?.generatorFee?.validity || '永久'}</p>
+              <p>是否确认购买？</p>
+            </div>
+          ),
+          onOk: async () => {
+            // 创建订单
+            const orderRes = await addOrderUsingPost({
+              generatorId: generatorInfo?.id,
+              userId: initialState.currentUser.id,
+              amount: generatorInfo?.generatorFee?.price
+            });
+            
+            if (orderRes.code === 0 && orderRes.data) {
+              message.success('订单创建成功，即将跳转到支付页面');
+              // 跳转到订单详情页面进行支付
+              navigate(`/order/${generatorInfo?.id}/${orderRes.data.orderId}`);
+            } else {
+              message.error('订单创建失败');
+            }
+          },
+          okText: '确认购买',
+          cancelText: '取消'
+        });
+      }
+    } catch (error) {
+      message.error('操作失败，请重试');
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -107,7 +165,11 @@ const DetailGeneratorPage: React.FC = () => {
             <Divider />
 
             <Space>
-              <Button type={'primary'} disabled={!initialState?.currentUser?.id}>
+              <Button 
+                type={'primary'} 
+                disabled={!initialState?.currentUser?.id}
+                onClick={handleUseGenerator}
+              >
                 立即使用
               </Button>
               {initialState?.currentUser?.id === generatorInfo?.userId && (

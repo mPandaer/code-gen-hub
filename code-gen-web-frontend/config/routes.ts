@@ -13,6 +13,8 @@ export default [
   },
   { path: '/user/profile', component: './User/Profile'},
   { path: '/', icon: 'smile', component: './Index', name: '主页' },
+  { path: '/order/:generatorId/:orderId', component: './Order/Confirm', name: '订单确认' },
+  { path: '/generator/use/:id', component: './Generator/Use', name: '使用生成器' },
   {
     path: '/admin',
     icon: 'crown',

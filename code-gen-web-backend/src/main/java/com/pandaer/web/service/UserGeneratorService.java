@@ -10,4 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserGeneratorService extends IService<UserGenerator> {
 
+    UserGenerator getGeneratorForPurchase(Long userId,Long generatorId);
 }

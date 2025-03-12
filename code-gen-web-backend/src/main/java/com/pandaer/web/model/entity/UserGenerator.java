@@ -22,7 +22,7 @@ public class UserGenerator {
     /**
      * 代码生成器ID
      */
-    @TableId(value = "generator_id")
+    @TableField(value = "generator_id")
     private Long generatorId;
 
     /**

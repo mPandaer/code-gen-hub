@@ -58,4 +58,7 @@ public interface GeneratorService extends IService<Generator> {
     File useGenerator(Generator generator, String distPath, Map<String, Object> dataModel) throws IOException, InterruptedException;
 
     void makeGenerator(MakingGeneratorRequest makingGeneratorRequest, HttpServletResponse response);
+
+
+    Boolean isFreeById(Long generatorId);
 }

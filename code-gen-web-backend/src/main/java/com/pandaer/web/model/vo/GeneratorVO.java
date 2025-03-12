@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.pandaer.web.model.entity.GeneratorFee;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -103,6 +104,12 @@ public class GeneratorVO implements Serializable {
      * 生成器对应的用户信息
      */
     private UserVO user;
+
+
+    /**
+     * 代码生成器付费信息
+     */
+    private GeneratorFeeVO generatorFee;
 
     /**
      * 包装类转对象

@@ -1,5 +1,6 @@
 package com.pandaer.web.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ZipUtil;
@@ -14,14 +15,18 @@ import com.pandaer.web.constant.FileConstant;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
 import com.pandaer.web.manager.CosManager;
+import com.pandaer.web.mapper.GeneratorFeeMapper;
 import com.pandaer.web.mapper.GeneratorMapper;
 import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.model.dto.generator.GeneratorQueryRequest;
 import com.pandaer.web.model.dto.generator.MakingGeneratorRequest;
 import com.pandaer.web.model.entity.Generator;
+import com.pandaer.web.model.entity.GeneratorFee;
 import com.pandaer.web.model.entity.User;
+import com.pandaer.web.model.vo.GeneratorFeeVO;
 import com.pandaer.web.model.vo.GeneratorVO;
 import com.pandaer.web.model.vo.UserVO;
+import com.pandaer.web.service.GeneratorFeeService;
 import com.pandaer.web.service.GeneratorService;
 import com.pandaer.web.service.UserService;
 import com.pandaer.web.utils.SqlUtils;
@@ -32,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +69,10 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     @Resource
     private CosManager cosManager;
 
+    @Resource
+    private GeneratorFeeService generatorFeeService;
+
+
 
     @Override
     public File useGenerator(Generator generator, String distPath, Map<String, Object> dataModel) throws IOException, InterruptedException {
@@ -72,7 +82,9 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         String currentDir = System.getProperty("user.dir");
 
         // TODO 可能%d有问题
-        String currentGeneratorWorkspace = String.format("%s/.temp/use/%d", currentDir, generator.getId());
+        // TODO 来一个随机ID
+        String snowflakeNextIdStr = IdUtil.getSnowflakeNextIdStr();
+        String currentGeneratorWorkspace = String.format("%s/.temp/use/%d/%s", currentDir, generator.getId(),snowflakeNextIdStr);
         FileUtil.mkdir(currentGeneratorWorkspace);
 
         String targetPath = String.format("%s/dist.zip", currentGeneratorWorkspace);
@@ -103,8 +115,8 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         String generatedCodeFilesDir = String.format("%s/dist/generated", currentGeneratorWorkspace);
         File generatedCodeFilesZip = ZipUtil.zip(generatedCodeFilesDir);
 
-        // 清空工作空间目录
-        FileUtil.del(currentGeneratorWorkspace);
+        // TODO 清空工作空间目录
+//        FileUtil.del(currentGeneratorWorkspace);
         return generatedCodeFilesZip;
     }
 
@@ -177,6 +189,19 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
 //        });
 
 
+    }
+
+
+
+    @Override
+    public Boolean isFreeById(Long generatorId) {
+        GeneratorFee fee = generatorFeeService.lambdaQuery().eq(GeneratorFee::getGeneratorId, generatorId).one();
+        if (fee == null) {
+            return true;
+        }
+
+        // TODO 考虑枚举值
+        return fee.getIsFree() == 1;
     }
 
 
@@ -264,6 +289,11 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         if (user != null) {
             generatorVO.setUser(user.mapToUserVO());
         }
+
+        GeneratorFee generatorFee = generatorFeeService.lambdaQuery()
+                .eq(GeneratorFee::getGeneratorId, generatorId)
+                .one();
+        generatorVO.setGeneratorFee(BeanUtil.toBean(generatorFee, GeneratorFeeVO.class));
         return generatorVO;
     }
 
@@ -278,6 +308,14 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
 
+
+
+        // 关联代码生成器付费信息
+        Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
+        Map<Long, GeneratorFee> generatorIdGeneratorFeeMapping = generatorFeeService.lambdaQuery().in(GeneratorFee::getGeneratorId, generatorIdSet).list()
+                .stream().collect(Collectors.toMap(GeneratorFee::getGeneratorId, Function.identity()));
+
+
         // 填充信息
         List<GeneratorVO> generatorVOList = generatorList.stream().map(generator -> {
             GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
@@ -289,6 +327,9 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             if (user != null) {
                 generatorVO.setUser(user.mapToUserVO());
             }
+
+            GeneratorFee generatorFee = generatorIdGeneratorFeeMapping.get(generatorVO.getId());
+            generatorVO.setGeneratorFee(BeanUtil.toBean(generatorFee, GeneratorFeeVO.class));
 
             return generatorVO;
         }).collect(Collectors.toList());
