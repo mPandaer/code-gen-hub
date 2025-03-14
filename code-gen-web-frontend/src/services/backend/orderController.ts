@@ -2,6 +2,21 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
+/** pageOrders GET /api/orders */
+export async function pageOrdersUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.pageOrdersUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageResponseOrderVO_>('/api/orders', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** addOrder POST /api/orders */
 export async function addOrderUsingPost(
   body: API.AddOrderRequest,
@@ -34,6 +49,21 @@ export async function getOrderByIdUsingGet(
 /** payOrder POST /api/orders/pay */
 export async function payOrderUsingPost(body: API.PayRequest, options?: { [key: string]: any }) {
   return request<API.BaseResponsePayResponse_>('/api/orders/pay', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** editOrderRemark POST /api/orders/remark */
+export async function editOrderRemarkUsingPost(
+  body: API.EditOrderRemarkRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseObject_>('/api/orders/remark', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

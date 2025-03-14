@@ -7,7 +7,10 @@ import com.pandaer.web.common.BaseResponse;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.common.ResultUtils;
 import com.pandaer.web.exception.BusinessException;
+import com.pandaer.web.model.dto.PageResponse;
+import com.pandaer.web.model.dto.order.EditOrderRemarkRequest;
 import com.pandaer.web.model.dto.order.AddOrderRequest;
+import com.pandaer.web.model.dto.order.SearchOrderParams;
 import com.pandaer.web.model.dto.pay.PayRequest;
 import com.pandaer.web.model.dto.pay.PayResponse;
 import com.pandaer.web.model.vo.OrderVO;
@@ -81,4 +84,36 @@ public class OrderController {
 
         return ResultUtils.success(payResponse);
     }
+
+    @GetMapping
+    public BaseResponse<PageResponse<OrderVO>> pageOrders(SearchOrderParams searchOrderRequest) {
+        // 查询数据
+        PageResponse<OrderVO> page = orderService.pageOrders(searchOrderRequest);
+
+        // 返回结果
+        return ResultUtils.success(page);
+
+    }
+
+
+    @PostMapping("remark")
+    public BaseResponse<?> editOrderRemark(@RequestBody EditOrderRemarkRequest editOrderRemarkRequest) {
+        // 校验参数
+        if (editOrderRemarkRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        ValidatedResult validateRes = editOrderRemarkRequest.validate();
+
+        if (!validateRes.isSuccess()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,validateRes.getMessage());
+        }
+
+        // 更新备注信息
+        orderService.editOrderRemark(editOrderRemarkRequest);
+
+        // 返回结果
+        return ResultUtils.success(null);
+    }
+
 }

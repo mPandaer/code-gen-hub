@@ -72,6 +72,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageResponseOrderVO_ = {
+    code?: number;
+    data?: PageResponseOrderVO_;
+    message?: string;
+  };
+
   type BaseResponsePageUser_ = {
     code?: number;
     data?: PageUser_;
@@ -126,6 +132,11 @@ declare namespace API {
 
   type DeleteRequest = {
     id?: number;
+  };
+
+  type EditOrderRemarkRequest = {
+    orderId?: string;
+    remark?: string;
   };
 
   type FileConfig = {
@@ -210,6 +221,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
+    generatorFee?: GeneratorFeeVO;
     id?: number;
     modelConfig?: ModelConfig;
     name?: string;
@@ -434,6 +446,21 @@ declare namespace API {
     generatorId?: number;
     pageNum?: number;
     pageSize?: number;
+  };
+
+  type pageOrdersUsingGETParams = {
+    generatorId?: number;
+    orderId?: string;
+    pageNum?: number;
+    pageSize?: number;
+    userId?: number;
+  };
+
+  type PageResponseOrderVO_ = {
+    data?: OrderVO[];
+    pageNum?: number;
+    pageSize?: number;
+    total?: number;
   };
 
   type PageUser_ = {

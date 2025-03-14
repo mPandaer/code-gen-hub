@@ -10,6 +10,7 @@ services:
     environment:
       - REDIS_PASSWORD=101807
     command: redis-server --appendonly yes
+    restart: always
 
 volumes:
   redis-data:
