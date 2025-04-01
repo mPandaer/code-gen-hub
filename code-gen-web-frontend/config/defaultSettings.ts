@@ -16,7 +16,7 @@ const Settings: ProLayoutProps & {
   fixedHeader: true,
   fixSiderbar: true,
   colorWeak: false,
-  title: '易代码平台',
+  title: 'CodeHub',
   pwa: true,
   iconfontUrl: '',
   token: {

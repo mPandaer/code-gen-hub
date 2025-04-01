@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Card, Button, message } from 'antd';
-import { useParams } from '@@/exports';
+import { useParams, history } from '@@/exports';
 import { getGeneratorVoByIdUsingGet, useGeneratorByIdOnlineUsingPost } from '@/services/backend/generatorController';
 import ModelConfigForm from './components/ModelConfigForm';
 import { saveAs } from 'file-saver';
@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 const GeneratorUsePage: React.FC = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [modelConfig, setModelConfig] = useState<any>(null);
 
   const loadData = async () => {
@@ -35,6 +36,10 @@ const GeneratorUsePage: React.FC = () => {
   }, [id]);
 
   const handleSubmit = async (values: Record<string, any>) => {
+    if (generating) {
+      return;
+    }
+    setGenerating(true);
     // 处理嵌套结构
     const processNestedValues = (models: any[], formValues: Record<string, any>) => {
       const result: Record<string, any> = {};
@@ -65,9 +70,11 @@ const GeneratorUsePage: React.FC = () => {
       }, { responseType: 'blob' });
       saveAs(blob, 'generator.zip');
       message.success('生成成功');
+      history.push(`/generator/detail/${id}`);
     } catch (error: any) {
       message.error('生成失败，' + error.message);
     }
+    setGenerating(false);
   };
 
   return (
@@ -77,6 +84,7 @@ const GeneratorUsePage: React.FC = () => {
           <ModelConfigForm
             onSubmit={handleSubmit}
             modelConfig={modelConfig}
+            submitting={generating}
           />
         ) : (
           <div>暂无配置数据</div>

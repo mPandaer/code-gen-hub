@@ -116,4 +116,19 @@ public class OrderController {
         return ResultUtils.success(null);
     }
 
+
+    @GetMapping("{id}/status")
+    public BaseResponse<OrderVO> queryOrderStatus(@PathVariable("id") String orderId) {
+        // 校验参数
+        if (StrUtil.isBlankIfStr(orderId)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 查询状态
+        OrderVO orderVO = orderService.queryOrderStatus(orderId);
+
+        // 返回结果
+        return ResultUtils.success(orderVO);
+    }
+
 }

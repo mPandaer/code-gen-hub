@@ -74,8 +74,8 @@ const UserRegisterPage: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" style={{ height: '100%' }} src="/logo.jpg" />}
-          title="易代码平台 - 注册"
+          logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
+          title="CodeHub - 注册"
           subTitle={'欢迎加入我们'}
           initialValues={{
             autoLogin: true,

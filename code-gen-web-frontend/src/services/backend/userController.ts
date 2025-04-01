@@ -165,6 +165,21 @@ export async function resetPasswordUsingPost(
   });
 }
 
+/** editUserProfile POST /api/user/profile */
+export async function editUserProfileUsingPost(
+  body: API.EditUserProfileRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseUserVO_>('/api/user/profile', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** userRegister POST /api/user/register */
 export async function userRegisterUsingPost(
   body: API.UserRegisterRequest,

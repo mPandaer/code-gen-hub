@@ -34,6 +34,7 @@ const DetailGeneratorPage: React.FC = () => {
   const [generatorInfo, setGeneratorInfo] = useState<API.GeneratorVO>();
   const { initialState, setInitialState } = useModel('@@initialState');
   const navigate = useNavigate();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const loadGeneratorInfo = async () => {
     try {
@@ -46,15 +47,69 @@ const DetailGeneratorPage: React.FC = () => {
     }
   };
 
+  const handlePurchaseConfirm = async () => {
+    // 显示购买确认弹窗
+    Modal.confirm({
+      title: '购买确认',
+      content: (
+        <div>
+          <p>该代码生成器需要购买才能使用</p>
+          <p>价格: ¥{generatorInfo?.generatorFee?.price || 0}</p>
+          <p>有效期: {generatorInfo?.generatorFee?.validity || '永久'}</p>
+          <p>是否确认购买？</p>
+        </div>
+      ),
+      onOk: async () => {
+        // 创建订单
+        const orderRes = await addOrderUsingPost({
+          generatorId: generatorInfo?.id,
+          userId: initialState?.currentUser?.id,
+          amount: generatorInfo?.generatorFee?.price
+        });
+        
+        if (orderRes.code === 0 && orderRes.data) {
+          message.success('订单创建成功，即将跳转到支付页面');
+          // 跳转到订单详情页面进行支付
+          navigate(`/order/${generatorInfo?.id}/${orderRes.data.orderId}`);
+        } else {
+          message.error('订单创建失败');
+        }
+      },
+      okText: '确认购买',
+      cancelText: '取消'
+    });
+  };
+
   const doDownload = async (url: string) => {
-    const urlObj = new URL(url);
-    const pathName = decodeURI(urlObj.pathname); // 会得到 '/hello/1'
-    // console.log(pathName);
-    const blob = await fileDownloadUsingGet({ filePath: pathName }, { responseType: 'blob' });
-    console.log(blob);
-    // 从路径中获取文件名
-    const fileName = pathName.split('/').pop() || 'download';
-    saveAs(blob, fileName);
+    if (!initialState?.currentUser?.id) {
+      message.error('请先登录');
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      // 检查用户是否已购买该生成器
+      const res = await getGeneratorForUserPurchaseUsingGet({
+        generatorId: generatorInfo?.id,
+        userId: initialState.currentUser.id
+      });
+      
+      // 如果已购买或免费，直接下载
+      if (res.data || generatorInfo?.generatorFee?.isFree === 1) {
+        const urlObj = new URL(url);
+        const pathName = decodeURI(urlObj.pathname);
+        const blob = await fileDownloadUsingGet({ filePath: pathName }, { responseType: 'blob' });
+        const fileName = pathName.split('/').pop() || 'download';
+        saveAs(blob, fileName);
+      } else {
+        await handlePurchaseConfirm();
+      }
+    } catch (error) {
+      message.error('下载失败，请重试');
+      console.error(error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleUseGenerator = async () => {
@@ -75,36 +130,7 @@ const DetailGeneratorPage: React.FC = () => {
         // 跳转到使用页面
         navigate(`/generator/use/${generatorInfo?.id}`);
       } else {
-        // 显示购买确认弹窗
-        Modal.confirm({
-          title: '购买确认',
-          content: (
-            <div>
-              <p>该代码生成器需要购买才能使用</p>
-              <p>价格: ¥{generatorInfo?.generatorFee?.price || 0}</p>
-              <p>有效期: {generatorInfo?.generatorFee?.validity || '永久'}</p>
-              <p>是否确认购买？</p>
-            </div>
-          ),
-          onOk: async () => {
-            // 创建订单
-            const orderRes = await addOrderUsingPost({
-              generatorId: generatorInfo?.id,
-              userId: initialState.currentUser.id,
-              amount: generatorInfo?.generatorFee?.price
-            });
-            
-            if (orderRes.code === 0 && orderRes.data) {
-              message.success('订单创建成功，即将跳转到支付页面');
-              // 跳转到订单详情页面进行支付
-              navigate(`/order/${generatorInfo?.id}/${orderRes.data.orderId}`);
-            } else {
-              message.error('订单创建失败');
-            }
-          },
-          okText: '确认购买',
-          cancelText: '取消'
-        });
+        await handlePurchaseConfirm();
       }
     } catch (error) {
       message.error('操作失败，请重试');
@@ -186,6 +212,8 @@ const DetailGeneratorPage: React.FC = () => {
                   onClick={async () => {
                     doDownload(generatorInfo?.distPath ?? '');
                   }}
+                  loading={isDownloading}
+                  disabled={isDownloading}
                 >
                   点击下载
                 </Button>

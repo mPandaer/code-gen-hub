@@ -7,7 +7,7 @@ import {
   getGeneratorVoByIdUsingGet,
   makeGeneratorOnlineUsingPost,
 } from '@/services/backend/generatorController';
-import { useParams } from '@@/exports';
+import { useParams, history } from '@@/exports';
 import {
   PageContainer,
   ProCard,
@@ -25,10 +25,12 @@ import { Button, message } from 'antd';
 import saveAs from 'file-saver';
 
 const AddGeneratorPage: React.FC = () => {
+  // const history = useHistory();
   const formRef = useRef<ProFormInstance>();
   const { id } = useParams();
   const [originInfo, setOriginInfo] = useState<API.GeneratorVO>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [makeLoading, setMakeLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<{
     baseInfo?: any;
     fileConfig?: any;
@@ -95,7 +97,7 @@ const AddGeneratorPage: React.FC = () => {
                 } });
                 if (resp.data) {
                   message.success('修改成功');
-                  // TODO 跳转到详情页
+                  history.push(`/generator/detail/${id}`);
                 }
               } else {
                 const resp = await addGeneratorUsingPost({
@@ -109,10 +111,12 @@ const AddGeneratorPage: React.FC = () => {
                 if (resp.data) {
                   message.success('创建成功');
                   // TODO 跳转到详情页
+                  history.push(`/`);
+
                 }
               }
-            } catch (e) {
-              message.success('创建失败');
+            } catch (e: any) {
+              message.error('创建失败111，' + e.message);
             }
           }}
           formProps={{
@@ -316,6 +320,7 @@ const AddGeneratorPage: React.FC = () => {
                     <ProFormItem>
                       <Button
                         type="primary"
+                        loading={makeLoading}
                         onClick={async () => {
                           // 使用已保存的数据
                           const { baseInfo, fileConfig, modelConfig } = formData;
@@ -327,7 +332,7 @@ const AddGeneratorPage: React.FC = () => {
                           console.log('打包信息：', templateFilesUrl);
 
                           message.success('开始制作生成器');
-                          // 后续的生成器制作逻辑...
+                          setMakeLoading(true);
                           try {
                             const resp = await makeGeneratorOnlineUsingPost({
                               meta: {
@@ -349,6 +354,8 @@ const AddGeneratorPage: React.FC = () => {
                             }
                           } catch (error) {
                             message.error('制作失败');
+                          } finally {
+                            setMakeLoading(false);
                           }
                         }}
                       >

@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
+import com.pandaer.web.converter.UserConverter;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.mapper.GeneratorMapper;
 import com.pandaer.web.mapper.OrderMapper;
@@ -13,24 +14,22 @@ import com.pandaer.web.model.dto.PageResponse;
 import com.pandaer.web.model.dto.order.AddOrderRequest;
 import com.pandaer.web.model.dto.order.EditOrderRemarkRequest;
 import com.pandaer.web.model.dto.order.SearchOrderParams;
-import com.pandaer.web.model.entity.Generator;
-import com.pandaer.web.model.entity.GeneratorFee;
-import com.pandaer.web.model.entity.Order;
-import com.pandaer.web.model.entity.User;
+import com.pandaer.web.model.entity.*;
+import com.pandaer.web.model.enums.OrderStatusEnum;
 import com.pandaer.web.model.vo.GeneratorFeeVO;
 import com.pandaer.web.model.vo.GeneratorVO;
 import com.pandaer.web.model.vo.OrderVO;
 import com.pandaer.web.model.vo.UserVO;
-import com.pandaer.web.service.GeneratorFeeService;
-import com.pandaer.web.service.GeneratorService;
-import com.pandaer.web.service.OrderService;
-import com.pandaer.web.service.UserService;
+import com.pandaer.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,6 +48,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
 
     @Autowired
+    private UserConverter userConverter;
+
+
+    @Autowired
     private GeneratorMapper generatorMapper;
     @Autowired
     private UserService userService;
@@ -56,6 +59,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     private GeneratorService generatorService;
     @Autowired
     private GeneratorFeeService generatorFeeService;
+    @Autowired
+    private PayService payService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private UserGeneratorService userGeneratorService;
 
     @Override
     public OrderVO addOrder(AddOrderRequest addOrderRequest) {
@@ -139,12 +148,46 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         }
     }
 
+    @Override
+    public OrderVO queryOrderStatus(String orderId) {
+        Order order = getById(orderId);
+        OrderVO orderVO = BeanUtil.toBean(order, OrderVO.class);
+        // 异步查询支付宝的订单状态
+        if (order.getOrderStatus().equals(OrderStatusEnum.PAYING.getCode())) {
+            Boolean res = stringRedisTemplate.opsForValue().setIfAbsent(order.getOrderId(), "doing", 15, TimeUnit.SECONDS);
+            if (Boolean.TRUE.equals(res)) {
+                CompletableFuture.runAsync(() -> {
+                    doQueryOrderStatus(order);
+                });
+            }
+
+        }
+
+        return orderVO;
+    }
+
+    private void doQueryOrderStatus(Order order) {
+        String paymentMethod = order.getPaymentMethod();
+        Order updatedOrder = payService.queryAndUpdateOrderStatus(order, paymentMethod);
+        updateById(updatedOrder);
+        Integer orderStatus = updatedOrder.getOrderStatus();
+        if (OrderStatusEnum.PAY_SUCCESS.getCode().equals(orderStatus)) {
+            // 记录用户购买了这个代码生成器
+            UserGenerator userGenerator = new UserGenerator();
+            userGenerator.setUserId(order.getUserId());
+            userGenerator.setGeneratorId(order.getGeneratorId());
+            userGeneratorService.save(userGenerator);
+        }
+
+    }
+
 
     // TODO 需要提取出去。
     private OrderVO mapToVO(Order order) {
         OrderVO orderVo = BeanUtil.toBean(order, OrderVO.class);
         User user = userMapper.selectById(order.getUserId());
-        orderVo.setUser(user.mapToUserVO());
+        UserVO userVO = userConverter.entityMapToVO(user);
+        orderVo.setUser(userVO);
         Generator generator = generatorMapper.selectById(order.getGeneratorId());
         orderVo.setGenerator(GeneratorVO.objToVo(generator));
         return orderVo;

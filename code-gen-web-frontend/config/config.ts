@@ -73,7 +73,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: '易代码平台',
+  title: 'CodeHub',
   layout: {
     locale: true,
     ...defaultSettings,
@@ -129,7 +129,7 @@ export default defineConfig({
   openAPI: [
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:8120/api/v2/api-docs',
+      schemaPath: 'http://localhost:8521/api/v2/api-docs',
       projectName: 'backend',
     },
   ],

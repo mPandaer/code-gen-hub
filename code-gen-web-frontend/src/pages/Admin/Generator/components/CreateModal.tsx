@@ -24,7 +24,7 @@ const handleAdd = async (fields: API.GeneratorAddRequest) => {
     return true;
   } catch (error: any) {
     hide();
-    message.error('创建失败，' + error.message);
+    message.error('创建失败333，' + error.message);
     return false;
   }
 };

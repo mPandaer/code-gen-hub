@@ -139,6 +139,13 @@ declare namespace API {
     remark?: string;
   };
 
+  type EditUserProfileRequest = {
+    userAvatar?: string;
+    userId?: number;
+    userName?: string;
+    userProfile?: string;
+  };
+
   type FileConfig = {
     files?: FileInfo[];
     generatedProjectPath?: string;
@@ -496,6 +503,11 @@ declare namespace API {
 
   type PayResponse = {
     htmlPage?: string;
+  };
+
+  type queryOrderStatusUsingGETParams = {
+    /** id */
+    id: string;
   };
 
   type ReplyGeneratorCommentRequest = {

@@ -7,6 +7,8 @@ import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+import java.math.BigDecimal;
+
 /**
  * Spring MVC Json 配置
  *
@@ -24,6 +26,7 @@ public class JsonConfig {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Long.class, ToStringSerializer.instance);
         module.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
         objectMapper.registerModule(module);
         return objectMapper;
     }

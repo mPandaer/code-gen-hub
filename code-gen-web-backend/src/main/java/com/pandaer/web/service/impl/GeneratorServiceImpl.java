@@ -14,6 +14,7 @@ import com.pandaer.maker.meta.Meta;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.constant.CommonConstant;
 import com.pandaer.web.constant.FileConstant;
+import com.pandaer.web.converter.UserConverter;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
 import com.pandaer.web.manager.CosManager;
@@ -25,6 +26,7 @@ import com.pandaer.web.model.entity.GeneratorFee;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.GeneratorFeeVO;
 import com.pandaer.web.model.vo.GeneratorVO;
+import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.GeneratorFeeService;
 import com.pandaer.web.service.GeneratorService;
 import com.pandaer.web.service.UserService;
@@ -32,7 +34,7 @@ import com.pandaer.web.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
@@ -58,9 +60,8 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     @Resource
     private UserService userService;
 
-
-    @Resource
-    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+    @Autowired
+    private UserConverter userConverter;
 
     @Resource
     private CosManager cosManager;
@@ -177,7 +178,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "传输生成器压缩包异常");
         }
-
+        
 
         // 异步 清理工作空间
 //        CompletableFuture.runAsync(() -> {
@@ -283,7 +284,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }
 
         if (user != null) {
-            generatorVO.setUser(user.mapToUserVO());
+            generatorVO.setUser(userConverter.entityMapToVO(user));
         }
 
         GeneratorFee generatorFee = generatorFeeService.lambdaQuery()
@@ -321,7 +322,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
                 user = userIdUserListMap.get(userId).get(0);
             }
             if (user != null) {
-                generatorVO.setUser(user.mapToUserVO());
+                generatorVO.setUser(userConverter.entityMapToVO(user));
             }
 
             GeneratorFee generatorFee = generatorIdGeneratorFeeMapping.get(generatorVO.getId());

@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
+import com.pandaer.web.converter.UserConverter;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.mapper.GeneratorCommentMapper;
 import com.pandaer.web.model.dto.generator.comment.AddGeneratorCommentRequest;
@@ -12,6 +13,7 @@ import com.pandaer.web.model.dto.generator.comment.ReplyGeneratorCommentRequest;
 import com.pandaer.web.model.entity.GeneratorComment;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.GeneratorCommentVO;
+import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.GeneratorCommentService;
 import com.pandaer.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class GeneratorCommentServiceImpl extends ServiceImpl<GeneratorCommentMap
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserConverter userConverter;
 
     @Override
     public void addComment(AddGeneratorCommentRequest generatorAddCommentRequest) {
@@ -104,7 +109,11 @@ public class GeneratorCommentServiceImpl extends ServiceImpl<GeneratorCommentMap
 
         List<GeneratorCommentVO> voList = commentPage.getRecords().stream().map(it -> {
             GeneratorCommentVO vo = BeanUtil.toBean(it, GeneratorCommentVO.class);
-            vo.setUserVO(idUserMapping.get(it.getUserId()).mapToUserVO());
+            User user = idUserMapping.get(it.getUserId());
+            if (user != null) {
+                vo.setUserVO(userConverter.entityMapToVO(user));
+            }
+
             return vo;
         }).collect(Collectors.toList());
 

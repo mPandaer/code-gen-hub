@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pandaer.web.mapper.GeneratorAuditMapper">
+
+    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.GeneratorAudit">
+            <id property="auditId" column="audit_id" />
+            <result property="generatorId" column="generator_id" />
+            <result property="auditorId" column="auditor_id" />
+            <result property="originalStatus" column="original_status" />
+            <result property="newStatus" column="new_status" />
+            <result property="auditComment" column="audit_comment" />
+            <result property="auditTime" column="audit_time" />
+            <result property="attachment" column="attachment" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        audit_id,generator_id,auditor_id,original_status,new_status,audit_comment,
+        audit_time,attachment
+    </sql>
+</mapper>

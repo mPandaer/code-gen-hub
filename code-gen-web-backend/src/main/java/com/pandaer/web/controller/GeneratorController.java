@@ -2,6 +2,7 @@ package com.pandaer.web.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -41,6 +42,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import static com.pandaer.web.constant.UserConstant.ADMIN_ROLE;
 
 /**
  * 帖子接口
@@ -82,6 +86,19 @@ public class GeneratorController {
         if (generatorAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+
+        String name = generatorAddRequest.getName();
+        // 额外的增强逻辑
+        // 校验代码生成器名称是否符合Java命名规范
+        if (!ReUtil.isMatch("^[a-zA-Z_$][a-zA-Z0-9_$]*$", name)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "名称必须符合Java标识符规范（字母/下划线/$开头，后续可包含数字）");
+        }
+
+        // 补充校验：不能是Java关键字（可选增强）
+        if (StrUtil.hasBlank(name) || ReUtil.isMatch("^(abstract|assert|boolean|break|byte|...)$", name)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "名称不能是Java保留关键字");
+        }
+
         Generator generator = new Generator();
         BeanUtils.copyProperties(generatorAddRequest, generator);
         List<String> tags = generatorAddRequest.getTags();
@@ -137,7 +154,7 @@ public class GeneratorController {
      * @return
      */
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @AuthCheck(mustRole = ADMIN_ROLE)
     public BaseResponse<Boolean> updateGenerator(@RequestBody GeneratorUpdateRequest generatorUpdateRequest) {
         if (generatorUpdateRequest == null || generatorUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -227,7 +244,7 @@ public class GeneratorController {
      * @return
      */
     @PostMapping("/list/page")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @AuthCheck(mustRole = ADMIN_ROLE)
     public BaseResponse<Page<Generator>> listGeneratorByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest) {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
@@ -292,6 +309,18 @@ public class GeneratorController {
         String zipTemplateFilesUrl = makingGeneratorRequest.getZipTemplateFilesUrl();
         // TODO 校验 url是否存在
 
+        // 一个校验的增强，校验代码生成器的名字只能是英文
+        String name = makingGeneratorRequest.getMeta().getName();
+        // 校验代码生成器名称是否符合Java命名规范
+        if (!ReUtil.isMatch("^[a-zA-Z_$][a-zA-Z0-9_$]*$", name)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "名称必须符合Java标识符规范（字母/下划线/$开头，后续可包含数字）");
+        }
+
+        // 补充校验：不能是Java关键字（可选增强）
+        if (StrUtil.hasBlank(name) || ReUtil.isMatch("^(abstract|assert|boolean|break|byte|...)$", name)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "名称不能是Java保留关键字");
+        }
+
         generatorService.makeGenerator(makingGeneratorRequest,response);
     }
 
@@ -332,13 +361,16 @@ public class GeneratorController {
         Generator oldGenerator = generatorService.getById(id);
         ThrowUtils.throwIf(oldGenerator == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
-        if (!oldGenerator.getUserId().equals(loginUser.getId()) && !loginUser.isAdmin()) {
+        if (!oldGenerator.getUserId().equals(loginUser.getId()) && !Objects.equals(loginUser.getUserRole(), ADMIN_ROLE)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean result = generatorService.updateById(generator);
         GeneratorFeeVO generatorFeeVO = generatorEditRequest.getGeneratorFee();
 //        GeneratorFee generatorFee = BeanUtil.toBean(generatorFeeVO, GeneratorFee.class);
-        generatorFeeService.lambdaUpdate().eq(GeneratorFee::getGeneratorId,generator.getId()).set(GeneratorFee::getPrice,generatorFeeVO.getPrice()).update();
+        if (generatorFeeVO!=null && generatorFeeVO.getPrice()!=null) {
+            generatorFeeService.lambdaUpdate().eq(GeneratorFee::getGeneratorId,generator.getId()).set(GeneratorFee::getPrice,generatorFeeVO.getPrice()).update();
+        }
+
 
         return ResultUtils.success(result);
     }

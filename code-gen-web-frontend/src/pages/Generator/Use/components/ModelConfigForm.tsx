@@ -5,6 +5,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 interface ModelConfigFormProps {
   onSubmit: (values: Record<string, any>) => void;
   modelConfig: any;
+  submitting?: boolean;
 }
 
 interface FieldModel {
@@ -25,6 +26,7 @@ const { Text } = Typography;
 const ModelConfigForm: React.FC<ModelConfigFormProps> = ({
   onSubmit,
   modelConfig,
+  submitting,
 }) => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState<Record<string, any>>({});
@@ -125,7 +127,7 @@ const ModelConfigForm: React.FC<ModelConfigFormProps> = ({
     >
       {modelConfig?.models?.map((model: FieldModel) => renderField(model))}
       <Form.Item>
-        <Button type="primary" htmlType="submit">
+        <Button type="primary" htmlType="submit" loading={submitting}>
           生成代码
         </Button>
       </Form.Item>

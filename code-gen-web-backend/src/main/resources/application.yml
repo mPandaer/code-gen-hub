@@ -53,8 +53,7 @@ spring:
 server:
   tomcat:
     max-http-response-size: 20MB
-  address: 0.0.0.0
-  port: 8120
+  port: 8521
   servlet:
     context-path: /api
     # cookie 30 天过期

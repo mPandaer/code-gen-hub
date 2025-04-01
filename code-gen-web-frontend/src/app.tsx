@@ -5,9 +5,16 @@ import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown } from './components/RightContent/AvatarDropdown';
 import { requestConfig } from './requestConfig';
-import logo from "@/assets/logo.jpg"
+import logo from "@/assets/logo.png"
 const loginPath = '/user/login';
-const whiteList = [loginPath, '/user/password/email', '/user/password/reset','/user/register'];
+const whiteList = [
+  '/user/login',
+  '/user/register',
+  '/user/password/email',
+  '/user/password/reset',
+  '/',
+  '/generator/detail'
+];
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -24,15 +31,9 @@ export async function getInitialState(): Promise<InitialState> {
       initialState.currentUser = res.data;
     } catch (error: any) {
       // 如果未登录
+      history.push(loginPath + "?redirect=" + location.pathname);
     }
 
-    // 模拟登录用户
-    // const mockUser: API.LoginUserVO = {
-    //   userAvatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-    //   userName: 'yupi',
-    //   userRole: 'admin',
-    // };
-    // initialState.currentUser = mockUser;
   }
   return initialState;
 }

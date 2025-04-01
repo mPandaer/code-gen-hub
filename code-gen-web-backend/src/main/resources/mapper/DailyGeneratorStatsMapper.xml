@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pandaer.web.mapper.DailyGeneratorStatsMapper">
+
+    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.DailyGeneratorStats">
+            <id property="statDate" column="stat_date" />
+            <result property="newGeneratorCount" column="new_generator_count" />
+            <result property="totalDownload" column="total_download" />
+            <result property="activeDeveloperCount" column="active_developer_count" />
+            <result property="avgRating" column="avg_rating" />
+            <result property="payConversionRate" column="pay_conversion_rate" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        stat_date,new_generator_count,total_download,active_developer_count,avg_rating,pay_conversion_rate
+    </sql>
+</mapper>

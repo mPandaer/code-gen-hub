@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Card, Avatar, Form, Input, Button, message, Layout, Menu, Modal, Tag, Typography } from 'antd';
 import { UserOutlined, CodeOutlined, LockOutlined, CrownOutlined, EditOutlined } from '@ant-design/icons';
-import { changePasswordUsingPut, getUserVoByIdUsingGet } from '@/services/backend/userController';
-import { useModel } from 'umi';
+import { changePasswordUsingPut, getUserVoByIdUsingGet, updateMyUserUsingPost } from '@/services/backend/userController';
+import { useModel, history } from 'umi';
+import { uploadFileUsingPost } from '@/services/backend/fileController';
 
 const { Sider, Content } = Layout;
 const { Paragraph } = Typography;
@@ -25,11 +26,31 @@ const Profile = () => {
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
-      // TODO: 调用API更新用户信息
-      message.success('更新成功');
-      setIsEditing(false);
-    } catch (error) {
-      message.error('更新失败');
+      const res = await updateMyUserUsingPost({
+        userName: values.username,
+        userProfile: values.description,
+      });
+      
+      if (res.code === 0) {
+        message.success('更新成功');
+        // Update the global user state
+        const { initialState, setInitialState } = useModel('@@initialState');
+        if (initialState?.currentUser) {
+          setInitialState({
+            ...initialState,
+            currentUser: {
+              ...initialState.currentUser,
+              userName: values.username,
+              userProfile: values.description,
+            },
+          });
+        }
+        setIsEditing(false);
+      } else {
+        message.error('更新失败：' + res.message);
+      }
+    } catch (error: any) {
+      message.error('更新失败：' + error.message);
     } finally {
       setLoading(false);
     }
@@ -38,17 +59,22 @@ const Profile = () => {
   const handlePasswordChange = async (values: any) => {
     try {
       setLoading(true);
-    //   console.log("修改密码：",values);
-      // TODO: 调用修改密码API
-      changePasswordUsingPut({
+      const res = await changePasswordUsingPut({
         oldPassword: values.oldPassword,
         newPassword: values.newPassword,
       });
-      message.success('密码修改成功');
-      setIsPasswordModalVisible(false);
-      passwordForm.resetFields();
-    } catch (error) {
-      message.error('密码修改失败');
+      
+      if (res.code === 0) {
+        message.success('密码修改成功，请重新登录');
+        setIsPasswordModalVisible(false);
+        passwordForm.resetFields();
+        // Redirect to login page
+        history.push('/user/login?redirect=' + window.location.pathname); 
+      } else {
+        message.error('密码修改失败：' + res.message);
+      }
+    } catch (error: any) {
+      message.error('密码修改失败：' + error.message);
     } finally {
       setLoading(false);
     }
@@ -62,6 +88,45 @@ const Profile = () => {
         return <Tag color="blue" icon={<UserOutlined />}>普通用户</Tag>;
       default:
         return <Tag>未知角色</Tag>;
+    }
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      const hide = message.loading('正在上传...');
+      const res = await uploadFileUsingPost(
+        { biz: 'user_avatar' },
+        {},
+        file
+      );
+      hide();
+      
+      if (res.code === 0) {
+        const avatarUrl = res.data;
+        // Update user profile with new avatar
+        const updateRes = await updateMyUserUsingPost({
+          userAvatar: avatarUrl,
+        });
+        
+        if (updateRes.code === 0) {
+          message.success('头像更新成功');
+          // Update global user state
+          const { initialState, setInitialState } = useModel('@@initialState');
+          if (initialState?.currentUser) {
+            setInitialState({
+              ...initialState,
+              currentUser: {
+                ...initialState.currentUser,
+                userAvatar: avatarUrl,
+              },
+            });
+          }
+        }
+      } else {
+        message.error('上传失败：' + res.message);
+      }
+    } catch (error: any) {
+      message.error('上传失败：' + error.message);
     }
   };
 
@@ -138,7 +203,18 @@ const Profile = () => {
                   display: 'inline-block',
                   cursor: 'pointer'
                 }}
-                onClick={() => {/* TODO: 处理头像上传 */}}
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      handleAvatarUpload(file);
+                    }
+                  };
+                  input.click();
+                }}
               >
                 <Avatar size={100} icon={<UserOutlined />} src={currentUser?.userAvatar} />
                 <div style={{

@@ -46,6 +46,20 @@ export async function getOrderByIdUsingGet(
   });
 }
 
+/** queryOrderStatus GET /api/orders/${param0}/status */
+export async function queryOrderStatusUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.queryOrderStatusUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  const { id: param0, ...queryParams } = params;
+  return request<API.BaseResponseOrderVO_>(`/api/orders/${param0}/status`, {
+    method: 'GET',
+    params: { ...queryParams },
+    ...(options || {}),
+  });
+}
+
 /** payOrder POST /api/orders/pay */
 export async function payOrderUsingPost(body: API.PayRequest, options?: { [key: string]: any }) {
   return request<API.BaseResponsePayResponse_>('/api/orders/pay', {

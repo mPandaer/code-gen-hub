@@ -7,6 +7,7 @@ import com.pandaer.web.common.DeleteRequest;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.common.ResultUtils;
 import com.pandaer.web.constant.UserConstant;
+import com.pandaer.web.converter.UserConverter;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.exception.ThrowUtils;
 import com.pandaer.web.model.dto.user.*;
@@ -19,6 +20,7 @@ import com.pandaer.web.validate.ValidatedResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,10 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Autowired
+    private UserConverter userConverter;
+
 
     // region 登录相关
 
@@ -156,7 +162,7 @@ public class UserController {
         User user = userService.getLoginUser(request);
 
         // 将用户实体对象映射为登录用户视图对象，并封装为成功响应返回
-        return ResultUtils.success(user.mapToLoginUserVO());
+        return ResultUtils.success(userConverter.entityMapToLoginVO(user));
     }
 
 
@@ -231,6 +237,28 @@ public class UserController {
         // 返回结果
         return ResultUtils.success(null);
     }
+
+
+    @PostMapping("profile")
+    public BaseResponse<UserVO> editUserProfile(@RequestBody EditUserProfileRequest editUserProfileRequest) {
+
+        // 参数校验
+        if (editUserProfileRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        ValidatedResult validatedResult = editUserProfileRequest.validate();
+        if (!validatedResult.isSuccess()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, validatedResult.getMessage());
+        }
+
+        // 修改用户资料
+        UserVO userVO = userService.editUserProfile(editUserProfileRequest);
+
+        // 返回结果
+        return ResultUtils.success(userVO);
+    }
+
 
 
 
@@ -332,7 +360,7 @@ public class UserController {
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
         BaseResponse<User> response = getUserById(id, request);
         User user = response.getData();
-        return ResultUtils.success(user.mapToUserVO());
+        return ResultUtils.success(userConverter.entityMapToVO(user));
     }
 
     /**
@@ -373,7 +401,7 @@ public class UserController {
         Page<User> userPage = userService.page(new Page<>(current, size),
                 userService.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
-        List<UserVO> userVO = userPage.getRecords().stream().map(User::mapToUserVO).collect(Collectors.toList());
+        List<UserVO> userVO = userPage.getRecords().stream().map(it -> userConverter.entityMapToVO(it)).collect(Collectors.toList());
         userVOPage.setRecords(userVO);
         return ResultUtils.success(userVOPage);
     }

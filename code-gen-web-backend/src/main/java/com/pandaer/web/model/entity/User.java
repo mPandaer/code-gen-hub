@@ -1,97 +1,114 @@
 package com.pandaer.web.model.entity;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.annotation.*;
-import com.pandaer.web.model.enums.UserRoleEnum;
-import com.pandaer.web.model.vo.LoginUserVO;
-import com.pandaer.web.model.vo.UserVO;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * 用户
- *
- 
+ * @TableName user
  */
-@TableName(value = "user")
+@TableName(value ="user")
 @Data
-public class User implements Serializable {
-
+public class User {
     /**
      * id
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户账号
+     * 账号
      */
+    @TableField(value = "userAccount")
     private String userAccount;
 
     /**
-     * 用户密码
+     * 密码
      */
+    @TableField(value = "userPassword")
     private String userPassword;
-
 
     /**
      * 用户邮箱
      */
+    @TableField(value = "userEmail")
     private String userEmail;
-
-
 
     /**
      * 用户昵称
      */
+    @TableField(value = "userName")
     private String userName;
 
     /**
      * 用户头像
      */
+    @TableField(value = "userAvatar")
     private String userAvatar;
 
     /**
      * 用户简介
      */
+    @TableField(value = "userProfile")
     private String userProfile;
 
     /**
      * 用户角色：user/admin/ban
      */
+    @TableField(value = "userRole")
     private String userRole;
 
     /**
      * 创建时间
      */
+    @TableField(value = "createTime")
     private Date createTime;
 
     /**
      * 更新时间
      */
+    @TableField(value = "updateTime")
     private Date updateTime;
 
     /**
      * 是否删除
      */
-    @TableLogic
+    @TableField(value = "isDelete")
     private Integer isDelete;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    /**
+     * 经验值
+     */
+    @TableField(value = "experience")
+    private Integer experience;
 
+    /**
+     * 用户等级
+     */
+    @TableField(value = "user_level")
+    private Integer userLevel;
 
-    public UserVO mapToUserVO() {
-        return BeanUtil.toBean(this, UserVO.class);
-    }
+    /**
+     * 金币余额
+     */
+    @TableField(value = "gold_coins")
+    private BigDecimal goldCoins;
 
-    public LoginUserVO mapToLoginUserVO() {
-        return BeanUtil.toBean(this, LoginUserVO.class);
-    }
+    /**
+     * 累计收益
+     */
+    @TableField(value = "total_income")
+    private BigDecimal totalIncome;
 
-    public boolean isAdmin() {
-        return UserRoleEnum.ADMIN.getValue().equals(userRole);
-    }
+    /**
+     * 当月剩余提现额度
+     */
+    @TableField(value = "monthly_quota")
+    private BigDecimal monthlyQuota;
 }

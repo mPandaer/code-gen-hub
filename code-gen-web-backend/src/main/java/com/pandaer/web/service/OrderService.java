@@ -23,4 +23,6 @@ public interface OrderService extends IService<Order> {
     PageResponse<OrderVO> pageOrders(SearchOrderParams searchOrderRequest);
 
     void editOrderRemark(EditOrderRemarkRequest editOrderRemarkRequest);
+
+    OrderVO queryOrderStatus(String orderId);
 }

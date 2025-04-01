@@ -1,5 +1,5 @@
 import { getGeneratorVoByIdUsingGet } from '@/services/backend/generatorController';
-import { payOrderUsingPost } from '@/services/backend/orderController';
+import { payOrderUsingPost, queryOrderStatusUsingGet } from '@/services/backend/orderController';
 import { useModel } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Card, Descriptions, message, Result, Spin } from 'antd';
@@ -10,6 +10,7 @@ const OrderConfirmPage: React.FC = () => {
   const { generatorId, orderId } = useParams();
   const [loading, setLoading] = useState(false);
   const [generatorInfo, setGeneratorInfo] = useState<API.GeneratorVO>();
+  const [checkingPayment, setCheckingPayment] = useState(false);
   const { initialState } = useModel('@@initialState');
   const navigate = useNavigate();
 
@@ -34,6 +35,44 @@ const OrderConfirmPage: React.FC = () => {
     loadGeneratorInfo();
   }, [generatorId]);
 
+  const checkPaymentStatus = async () => {
+    const maxAttempts = 100;
+    const intervalSeconds = 10;
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      try {
+        const res = await queryOrderStatusUsingGet({ id: orderId });
+        if (res.data) {
+          const status = res.data.orderStatus;
+          
+          if (status === 1) { // PAY_SUCCESS
+            message.success('支付成功！');
+            setCheckingPayment(false);
+            navigate(`/generator/detail/${generatorId}`);
+            return;
+          } else if ([2, 3, 9999].includes(status)) { // CANCEL, PAY_FAIL, UNKNOWN
+            message.error('支付失败：' + res.data.orderStatus);
+            setCheckingPayment(false);
+            return;
+          }
+        }
+        
+        attempts++;
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, intervalSeconds * 1000));
+        }
+      } catch (error: any) {
+        message.error('查询支付状态失败：' + error.message);
+        setCheckingPayment(false);
+        return;
+      }
+    }
+
+    message.error('支付超时，请检查支付状态');
+    setCheckingPayment(false);
+  };
+
   const handlePayment = async () => {
     if (!generatorId || !initialState?.currentUser?.id) {
       message.error('订单信息不完整');
@@ -48,13 +87,14 @@ const OrderConfirmPage: React.FC = () => {
       });
 
       if (res.code === 0 && res.data?.htmlPage) {
-        // 创建一个新窗口
         const newWindow = window.open('', '_blank');
         if (newWindow) {
-          // 写入HTML内容
           newWindow.document.write(res.data.htmlPage);
           newWindow.document.close();
           message.success('正在跳转到支付页面');
+          setCheckingPayment(true);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          checkPaymentStatus();
         } else {
           message.error('无法打开支付窗口，请检查是否被浏览器拦截');
         }
@@ -68,10 +108,11 @@ const OrderConfirmPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || checkingPayment) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
         <Spin size="large" />
+        {checkingPayment && <div style={{ marginTop: '20px' }}>正在查询支付状态...</div>}
       </div>
     );
   }

@@ -24,7 +24,7 @@ const handleAdd = async (fields: API.UserAddRequest) => {
     return true;
   } catch (error: any) {
     hide();
-    message.error('创建失败，' + error.message);
+    message.error('创建失败222，' + error.message);
     return false;
   }
 };

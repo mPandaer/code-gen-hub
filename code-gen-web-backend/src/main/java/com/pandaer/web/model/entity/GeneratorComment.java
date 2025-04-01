@@ -1,6 +1,9 @@
 package com.pandaer.web.model.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
@@ -52,7 +55,6 @@ public class GeneratorComment {
      * 状态（0：待审核 1：已发布 2：已删除）
      */
     @TableField(value = "status")
-    @TableLogic(delval = "2",value = "1")
     private Integer status;
 
     /**

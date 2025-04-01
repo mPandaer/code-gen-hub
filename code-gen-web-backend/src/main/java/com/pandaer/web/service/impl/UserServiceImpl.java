@@ -1,19 +1,23 @@
 package com.pandaer.web.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pandaer.web.common.ErrorCode;
 import com.pandaer.web.constant.CommonConstant;
+import com.pandaer.web.converter.UserConverter;
 import com.pandaer.web.exception.BusinessException;
 import com.pandaer.web.mapper.UserMapper;
 import com.pandaer.web.model.dto.user.ChangePasswordRequest;
+import com.pandaer.web.model.dto.user.EditUserProfileRequest;
 import com.pandaer.web.model.dto.user.UserQueryRequest;
 import com.pandaer.web.model.entity.PasswordResetToken;
 import com.pandaer.web.model.entity.ResetPasswordRequest;
 import com.pandaer.web.model.entity.User;
 import com.pandaer.web.model.vo.LoginUserVO;
+import com.pandaer.web.model.vo.UserVO;
 import com.pandaer.web.service.UserService;
 import com.pandaer.web.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +31,9 @@ import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
+import java.util.Objects;
 
+import static com.pandaer.web.constant.UserConstant.ADMIN_ROLE;
 import static com.pandaer.web.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -45,6 +51,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private RedisTemplate<String,String> stringRedisTemplate;
+
+    @Autowired
+    private UserConverter userConverter;
 
     @Value("${app.baseUrl}")
     private String baseUrl;
@@ -80,6 +89,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 创建用户对象并设置账户名和加密后的密码
             User user = new User();
             user.setUserAccount(userAccount);
+            // TODO 来一个默认的命令策略？
+            user.setUserName(userAccount);
             user.setUserPassword(encryptPassword);
 
             // 将用户信息持久化到数据库
@@ -122,7 +133,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 在会话中设置用户登录状态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return user.mapToLoginUserVO();
+        return userConverter.entityMapToLoginVO(user);
+//        return user.mapToLoginUserVO();
     }
 
 
@@ -173,7 +185,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = (User) userObj;
 
         // 检查用户对象是否为空，并判断用户是否为管理员
-        return user != null && user.isAdmin();
+        return user != null && Objects.equals(user.getUserRole(), ADMIN_ROLE);
     }
 
 
@@ -382,6 +394,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 将当前令牌标记为已使用，确保其无法再次使用
         stringRedisTemplate.delete(resetPasswordRequest.getEmail());
+    }
+
+    @Override
+    public UserVO editUserProfile(EditUserProfileRequest editUserProfileRequest) {
+        // 根据ID查询用户信息
+        User user = getById(editUserProfileRequest.getUserId());
+
+        // 修改用户信息
+        if (StrUtil.isNotBlank(editUserProfileRequest.getUserName())) {
+            user.setUserName(editUserProfileRequest.getUserName());
+        }
+
+        if (StrUtil.isNotBlank(editUserProfileRequest.getUserAvatar())) {
+            user.setUserAvatar(editUserProfileRequest.getUserAvatar());
+        }
+
+        if (StrUtil.isNotBlank(editUserProfileRequest.getUserProfile())) {
+            user.setUserProfile(editUserProfileRequest.getUserProfile());
+        }
+
+        // 持久化
+        updateById(user);
+        // 返回结果
+        return userConverter.entityMapToVO(user);
+//        return user.mapToUserVO();
+
     }
 
 }
