@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pandaer.web.mapper.UserIncomeDetailMapper">
+<mapper namespace="com.pandaer.web.user.mapper.UserIncomeDetailMapper">
 
-    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.UserIncomeDetail">
+    <resultMap id="BaseResultMap" type="com.pandaer.web.user.entity.UserIncomeDetail">
             <id property="id" column="id" />
             <result property="userId" column="user_id" />
             <result property="orderId" column="order_id" />

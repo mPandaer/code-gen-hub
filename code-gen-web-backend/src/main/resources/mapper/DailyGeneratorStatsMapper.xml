@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pandaer.web.mapper.DailyGeneratorStatsMapper">
+<mapper namespace="com.pandaer.web.statistic.mapper.DailyGeneratorStatsMapper">
 
-    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.DailyGeneratorStats">
+    <resultMap id="BaseResultMap" type="com.pandaer.web.statistic.entity.DailyGeneratorStats">
             <id property="statDate" column="stat_date" />
             <result property="newGeneratorCount" column="new_generator_count" />
             <result property="totalDownload" column="total_download" />

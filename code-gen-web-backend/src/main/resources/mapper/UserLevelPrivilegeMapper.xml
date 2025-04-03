@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pandaer.web.mapper.UserLevelPrivilegeMapper">
+<mapper namespace="com.pandaer.web.user.mapper.UserLevelPrivilegeMapper">
 
-    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.UserLevelPrivilege">
+    <resultMap id="BaseResultMap" type="com.pandaer.web.user.entity.UserLevelPrivilege">
             <id property="level" column="level" />
             <result property="levelName" column="level_name" />
             <result property="minExp" column="min_exp" />
@@ -12,10 +12,11 @@
             <result property="withdrawFeeRate" column="withdraw_fee_rate" />
             <result property="monthlyQuota" column="monthly_quota" />
             <result property="privileges" column="privileges" />
+            <result property="commissionRate" column="commission_rate" />
     </resultMap>
 
     <sql id="Base_Column_List">
         level,level_name,min_exp,max_exp,withdraw_fee_rate,monthly_quota,
-        privileges
+        privileges,commission_rate
     </sql>
 </mapper>

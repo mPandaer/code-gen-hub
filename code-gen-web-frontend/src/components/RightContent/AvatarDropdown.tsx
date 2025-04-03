@@ -8,9 +8,19 @@ import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import { Link } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
+import { Progress } from 'antd';
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
+};
+
+// 添加等级边框颜色映射
+const levelBorderColors: Record<number, string> = {
+  1: '#8B939A', // 新手灰
+  2: '#4CAF50', // 初级绿
+  3: '#2196F3', // 中级蓝
+  4: '#9C27B0', // 高级紫
+  5: '#FF9800', // 专家橙
 };
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
@@ -68,6 +78,28 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     );
   }
 
+  const renderUserLevel = () => {
+    if (!currentUser?.privilege) return null;
+    
+    const { experience, privilege } = currentUser;
+    const progressPercent = ((experience - privilege.minExp) / (privilege.maxExp - privilege.minExp)) * 100;
+    
+    return (
+      <div style={{ padding: '0 16px', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <span>Lv.{privilege.level} {privilege.levelName}</span>
+          <span>{experience}/{privilege.maxExp}</span>
+        </div>
+        <Progress 
+          percent={progressPercent} 
+          showInfo={false} 
+          strokeColor="#1DA57A"
+          size="small"
+        />
+      </div>
+    );
+  };
+
   const menuItems = [
     ...(menu
       ? [
@@ -86,6 +118,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
           },
         ]
       : []),
+    {
+      key: 'userLevel',
+      label: renderUserLevel(),
+      disabled: true,
+    },
+    {
+      type: 'divider' as const,
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -108,9 +148,27 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     >
       <Space>
         {currentUser?.userAvatar ? (
-          <Avatar size="small" src={currentUser?.userAvatar} />
+          <div style={{
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: '50%',
+            border: `1.5px solid ${currentUser?.userLevel ? levelBorderColors[currentUser.userLevel] || '#8B939A' : '#8B939A'}`,
+            lineHeight: 0,
+          }}>
+            <Avatar size="small" src={currentUser.userAvatar} />
+          </div>
         ) : (
-          <Avatar size="small" icon={<UserOutlined />} />
+          <div style={{
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: '50%',
+            border: `1.5px solid ${currentUser?.userLevel ? levelBorderColors[currentUser.userLevel] || '#8B939A' : '#8B939A'}`,
+            lineHeight: 0,
+          }}>
+            <Avatar size="small" icon={<UserOutlined />} />
+          </div>
         )}
         <span className="anticon">{currentUser?.userName ?? '无名'}</span>
       </Space>

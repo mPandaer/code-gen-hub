@@ -176,6 +176,7 @@ declare namespace API {
   };
 
   type Generator = {
+    auditStatus?: number;
     author?: string;
     basePackage?: string;
     createTime?: string;
@@ -184,6 +185,7 @@ declare namespace API {
     fileConfig?: string;
     id?: number;
     isDelete?: number;
+    lastAuditTime?: string;
     modelConfig?: string;
     name?: string;
     picture?: string;
@@ -349,9 +351,15 @@ declare namespace API {
 
   type LoginUserVO = {
     createTime?: string;
+    experience?: number;
+    goldCoins?: number;
     id?: number;
+    monthlyQuota?: number;
+    privilege?: UserLevelPrivilege;
+    totalIncome?: number;
     updateTime?: string;
     userAvatar?: string;
+    userLevel?: number;
     userName?: string;
     userProfile?: string;
     userRole?: string;
@@ -533,14 +541,18 @@ declare namespace API {
   };
 
   type User = {
-    admin?: boolean;
     createTime?: string;
+    experience?: number;
+    goldCoins?: number;
     id?: number;
     isDelete?: number;
+    monthlyQuota?: number;
+    totalIncome?: number;
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
     userEmail?: string;
+    userLevel?: number;
     userName?: string;
     userPassword?: string;
     userProfile?: string;
@@ -560,6 +572,16 @@ declare namespace API {
     purchaseTime?: string;
     status?: number;
     userId?: number;
+  };
+
+  type UserLevelPrivilege = {
+    level?: number;
+    levelName?: string;
+    maxExp?: number;
+    minExp?: number;
+    monthlyQuota?: number;
+    privileges?: string;
+    withdrawFeeRate?: number;
   };
 
   type UserLoginRequest = {
@@ -600,8 +622,14 @@ declare namespace API {
 
   type UserVO = {
     createTime?: string;
+    experience?: number;
+    goldCoins?: number;
     id?: number;
+    monthlyQuota?: number;
+    privilege?: UserLevelPrivilege;
+    totalIncome?: number;
     userAvatar?: string;
+    userLevel?: number;
     userName?: string;
     userProfile?: string;
     userRole?: string;

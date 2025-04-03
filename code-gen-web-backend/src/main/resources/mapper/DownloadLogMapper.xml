@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pandaer.web.mapper.DownloadLogMapper">
+<mapper namespace="com.pandaer.web.generator.mapper.DownloadLogMapper">
 
-    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.DownloadLog">
+    <resultMap id="BaseResultMap" type="com.pandaer.web.generator.entity.DownloadLog">
             <id property="id" column="id" />
             <result property="generatorId" column="generator_id" />
             <result property="userId" column="user_id" />
@@ -17,7 +17,7 @@
         id,generator_id,user_id,client_ip,device_type,create_time
     </sql>
 
-    <select id="selectDailyStats" resultType="com.pandaer.web.model.vo.DailyDownloadVO">
+    <select id="selectDailyStats" resultType="com.pandaer.web.statistic.dto.resp.DailyDownloadVO">
         SELECT
             DATE(create_time) AS date,
             COUNT(*) AS downloadCount,
@@ -30,7 +30,7 @@
 
 
 
-    <select id="selectGeneratorStats" resultType="com.pandaer.web.model.vo.GeneratorDownloadVO">
+    <select id="selectGeneratorStats" resultType="com.pandaer.web.generator.dto.resp.GeneratorDownloadVO">
         select download_log.generator_id as generatorId,generator.name as generatorName,
                count(download_log.id) as downloadCount from download_log
         left join generator on download_log.generator_id = generator.id
@@ -39,7 +39,7 @@
 
 
 
-    <select id="selectDailyRegisterUserStats" resultType="com.pandaer.web.model.vo.DailyRegisterUserVO">
+    <select id="selectDailyRegisterUserStats" resultType="com.pandaer.web.statistic.dto.resp.DailyRegisterUserVO">
         SELECT
             DATE(createTime) AS `date`,
             COUNT(id) AS newUserCount

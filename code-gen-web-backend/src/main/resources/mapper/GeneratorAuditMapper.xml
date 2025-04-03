@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pandaer.web.mapper.GeneratorAuditMapper">
+<mapper namespace="com.pandaer.web.generator.mapper.GeneratorAuditMapper">
 
-    <resultMap id="BaseResultMap" type="com.pandaer.web.model.entity.GeneratorAudit">
+    <resultMap id="BaseResultMap" type="com.pandaer.web.generator.entity.GeneratorAudit">
             <id property="auditId" column="audit_id" />
             <result property="generatorId" column="generator_id" />
             <result property="auditorId" column="auditor_id" />

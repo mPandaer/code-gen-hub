@@ -12,29 +12,25 @@ const whiteList = [
   '/user/register',
   '/user/password/email',
   '/user/password/reset',
-  '/',
   '/generator/detail'
 ];
 
-/**
- * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
- * */
 export async function getInitialState(): Promise<InitialState> {
   const initialState: InitialState = {
     currentUser: undefined,
   };
-  // 如果不是登录页面，执行
-  const { location } = history;
-  if (!whiteList.includes(location.pathname)) {
-    try {
-      const res = await getLoginUserUsingGet();
-      initialState.currentUser = res.data;
-    } catch (error: any) {
-      // 如果未登录
+  
+  try {
+    const res = await getLoginUserUsingGet();
+    initialState.currentUser = res.data;
+  } catch (error: any) {
+    // 如果未登录且当前不在白名单路由，则跳转到登录页
+    const { location } = history;
+    if (!whiteList.includes(location.pathname)) {
       history.push(loginPath + "?redirect=" + location.pathname);
     }
-
   }
+
   return initialState;
 }
 
